@@ -39,6 +39,8 @@ body {
   height: 64px;
   will-change: transform;
   transition: opacity 0.2s;
+  --x: 0px;
+  --y: 0px;
 }
 
 .apple:hover {
@@ -49,6 +51,48 @@ body {
   cursor: grabbing;
   opacity: 0.8;
   z-index: 1000;
+}
+
+.apple.hint-move {
+  animation: moveToBasket 2s infinite;
+  filter: brightness(1.5) drop-shadow(0 0 10px yellow);
+  z-index: 2;
+}
+
+@keyframes moveToBasket {
+  0% {
+    transform: translate(var(--x), var(--y));
+  }
+  40% {
+    transform: translate(var(--hint-x), var(--hint-y));
+  }
+  60% {
+    transform: translate(var(--hint-x), var(--hint-y));
+  }
+  100% {
+    transform: translate(var(--x), var(--y));
+  }
+}
+
+.apple.highlight {
+  animation: pulse 1s infinite;
+  filter: brightness(1.5) drop-shadow(0 0 10px yellow);
+  z-index: 2;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--x), var(--y)) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 1;
+  }
 }
 
 .flexi {

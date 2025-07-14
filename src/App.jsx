@@ -8,6 +8,11 @@ function App() {
   const [visibleBaskets, setVisibleBaskets] = useState([true, true, true, true])
   const [level, setLevel] = useState(4) // Start with 4 baskets
   const messageTimeoutRef = useRef(null)
+  const inactivityTimeoutRef = useRef(null)
+  const hintTimeoutRef = useRef(null)
+  const [highlightedAppleId, setHighlightedAppleId] = useState(null)
+  const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
+  const [isShowingHint, setIsShowingHint] = useState(false)
   const [flexiMessage, setFlexiMessage] = useState("Divide the apples so every basket has the same number!")
   const [apples, setApples] = useState(() => {
     const GRID_COLS = 6
@@ -42,6 +47,7 @@ function App() {
       case 3: return 4;  // 3 baskets: 4 apples each
       case 2: return 6;  // 2 baskets: 6 apples each
       case 1: return 12; // 1 basket: all 12 apples
+      case 0: return 0;  // 0 baskets: no apples allowed
       default: return 3;
     }
   }
@@ -55,11 +61,92 @@ function App() {
     "The basket can't fit any more apples!"
   ]
 
+  // Reset inactivity timer
+  const resetInactivityTimer = () => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current)
+    }
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current)
+    }
+    
+    setIsShowingHint(false)
+    
+    // Only set timer if we're on the 4-basket page
+    if (level === 4) {
+      inactivityTimeoutRef.current = setTimeout(() => {
+        // Highlight the first apple in the second row (index 6)
+        setHighlightedAppleId(6)
+        
+        // Start hint animation after highlighting
+        hintTimeoutRef.current = setTimeout(() => {
+          const basketElement = document.querySelector('.basket')
+          if (basketElement) {
+            const basketRect = basketElement.getBoundingClientRect()
+            const containerRect = containerRef.current.getBoundingClientRect()
+            
+            setHintPosition({
+              x: basketRect.left - containerRect.left + (basketRect.width / 2) - 32,
+              y: basketRect.top - containerRect.top - 20 // Move it higher up above the basket
+            })
+            setIsShowingHint(true)
+          }
+        }, 500) // Start hint animation 0.5 seconds after highlight
+      }, 3000)
+    } else {
+      setHighlightedAppleId(null)
+    }
+  }
+
+  // Clear highlight and timer when level changes
+  useEffect(() => {
+    setHighlightedAppleId(null)
+    setIsShowingHint(false)
+    resetInactivityTimer()
+    return () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current)
+      }
+    }
+  }, [level])
+
+  // Add event listeners for user activity
+  useEffect(() => {
+    const handleActivity = () => {
+      setHighlightedAppleId(null)
+      setIsShowingHint(false)
+      resetInactivityTimer()
+    }
+
+    window.addEventListener('mousemove', handleActivity)
+    window.addEventListener('click', handleActivity)
+    window.addEventListener('keydown', handleActivity)
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity)
+      window.removeEventListener('click', handleActivity)
+      window.removeEventListener('keydown', handleActivity)
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current)
+      }
+    }
+  }, [level])
+
   const handleMouseDown = (e, id) => {
     const apple = e.target
     const rect = apple.getBoundingClientRect()
     const offsetX = e.clientX - rect.left
     const offsetY = e.clientY - rect.top
+
+    setHighlightedAppleId(null)
+    setIsShowingHint(false)
+    resetInactivityTimer()
 
     setApples(prevApples =>
       prevApples.map(a =>
@@ -180,7 +267,7 @@ function App() {
 
   // Handle forward button click
   const handleForward = () => {
-    if (level <= 1) return
+    if (level <= 0) return
     
     setApples(prevApples => 
       prevApples.map(apple => ({
@@ -200,7 +287,13 @@ function App() {
     
     setBasketCounts(new Array(4).fill(0))
     setLevel(prev => prev - 1)
-    setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
+    
+    // Special message for 0 baskets
+    if (level === 1) {
+      setFlexiMessage("Oh no! Where did all the baskets go? We can't divide by zero!")
+    } else {
+      setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
+    }
   }
 
   // Handle back button click
@@ -230,7 +323,13 @@ function App() {
     
     // Update level and message
     setLevel(prev => prev + 1)
-    setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
+    
+    // Special message when coming back from 0 baskets
+    if (level === 0) {
+      setFlexiMessage("Phew! We got a basket back. Now we can divide again!")
+    } else {
+      setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
+    }
   }
 
   return (
@@ -246,9 +345,13 @@ function App() {
         {apples.map((apple) => (
           <div 
             key={apple.id}
-            className={`apple ${apple.isDragging ? 'dragging' : ''}`}
+            className={`apple ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
             style={{
-              transform: `translate(${apple.x}px, ${apple.y}px)`,
+              '--x': `${apple.x}px`,
+              '--y': `${apple.y}px`,
+              '--hint-x': `${hintPosition.x}px`,
+              '--hint-y': `${hintPosition.y}px`,
+              transform: apple.isDragging ? `translate(${apple.x}px, ${apple.y}px)` : `translate(var(--x), var(--y))`,
               position: 'absolute',
               touchAction: 'none'
             }}
@@ -289,7 +392,7 @@ function App() {
           <button 
             className="nav-button" 
             onClick={handleForward}
-            disabled={level <= 1}
+            disabled={level <= 0}
           >
             Forward →
           </button>
