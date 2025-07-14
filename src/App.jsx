@@ -41,6 +41,7 @@ function App() {
       case 4: return 3;  // 4 baskets: 3 apples each
       case 3: return 4;  // 3 baskets: 4 apples each
       case 2: return 6;  // 2 baskets: 6 apples each
+      case 1: return 12; // 1 basket: all 12 apples
       default: return 3;
     }
   }
@@ -179,7 +180,7 @@ function App() {
 
   // Handle forward button click
   const handleForward = () => {
-    if (level <= 2) return
+    if (level <= 1) return
     
     setApples(prevApples => 
       prevApples.map(apple => ({
@@ -206,6 +207,7 @@ function App() {
   const handleBack = () => {
     if (level >= 4) return
     
+    // Reset apples to original positions
     setApples(prevApples => 
       prevApples.map(apple => ({
         ...apple,
@@ -216,13 +218,17 @@ function App() {
       }))
     )
     
+    // Show all baskets for the new level
     const newVisibleBaskets = Array(4).fill(false)
     for (let i = 0; i < level + 1; i++) {
       newVisibleBaskets[i] = true
     }
     setVisibleBaskets(newVisibleBaskets)
     
+    // Reset basket counts
     setBasketCounts(new Array(4).fill(0))
+    
+    // Update level and message
     setLevel(prev => prev + 1)
     setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
   }
@@ -255,7 +261,6 @@ function App() {
           {visibleBaskets.map((isVisible, index) => 
             isVisible && (
               <div key={index} className="basket">
-                <div className="basket-top"></div>
                 <div className="basket-body">
                   {basketCounts[index] > 0 && (
                     <div className="basket-counter">{basketCounts[index]}</div>
@@ -284,7 +289,7 @@ function App() {
           <button 
             className="nav-button" 
             onClick={handleForward}
-            disabled={level <= 2}
+            disabled={level <= 1}
           >
             Forward →
           </button>
