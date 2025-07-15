@@ -410,14 +410,14 @@ function App() {
             onClick={handleBack}
             disabled={level >= 4}
           >
-            ← Back
+            &lt;
           </button>
           <button 
             className="nav-button" 
             onClick={handleForward}
             disabled={level <= 0}
           >
-            Forward →
+            &gt;
           </button>
         </div>
       </div>
