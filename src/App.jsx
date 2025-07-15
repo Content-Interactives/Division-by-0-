@@ -42,14 +42,18 @@ function App() {
 
   // Get max apples per basket based on level
   const getMaxApplesPerBasket = () => {
+    console.log('Getting max apples for level:', level)
+    let maxApples;
     switch (level) {
-      case 4: return 3;  // 4 baskets: 3 apples each
-      case 3: return 4;  // 3 baskets: 4 apples each
-      case 2: return 6;  // 2 baskets: 6 apples each
-      case 1: return 12; // 1 basket: all 12 apples
-      case 0: return 0;  // 0 baskets: no apples allowed
-      default: return 3;
+      case 4: maxApples = 3; break;  // 4 baskets: 3 apples each
+      case 3: maxApples = 4; break;  // 3 baskets: 4 apples each
+      case 2: maxApples = 6; break;  // 2 baskets: 6 apples each
+      case 1: maxApples = 12; break; // 1 basket: all 12 apples
+      case 0: maxApples = 0; break;  // 0 baskets: no apples allowed
+      default: maxApples = 3;
     }
+    console.log('Max apples allowed:', maxApples)
+    return maxApples;
   }
 
   const warningMessages = [
@@ -203,16 +207,11 @@ function App() {
       })
 
       if (droppedInBasket && visibleBaskets[basketIndex]) {
-        const updateKey = `${draggedApple.id}-${basketIndex}`
-        if (lastBasketUpdateRef.current === updateKey) {
-          return prevApples.map(a =>
-            a.id === draggedApple.id ? { ...a, isDragging: false } : a
-          )
-        }
-        lastBasketUpdateRef.current = updateKey
-
         const maxApples = getMaxApplesPerBasket()
-        if (basketCounts[basketIndex] >= maxApples && draggedApple.basketIndex !== basketIndex) {
+        
+        // If the basket already has max apples, return the apple to its original position
+        if (basketCounts[basketIndex] >= maxApples) {
+          console.log('Basket is full, returning apple to original position')
           const randomIndex = Math.floor(Math.random() * warningMessages.length)
           setFlexiMessage(`${warningMessages[randomIndex]} (Max: ${maxApples} apples)`)
           
@@ -237,6 +236,7 @@ function App() {
           )
         }
 
+        // If we get here, basket has room
         const newBasketCounts = [...basketCounts]
         if (draggedApple.basketIndex !== null) {
           newBasketCounts[draggedApple.basketIndex]--
@@ -251,6 +251,7 @@ function App() {
         )
       }
 
+      // If not dropped in a basket, return to original position
       return prevApples.map(a =>
         a.id === draggedApple.id
           ? {
