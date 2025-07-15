@@ -58,12 +58,12 @@ function App() {
   }
 
   const warningMessages = [
-    "Oops! This basket is full!",
-    "That basket can't hold any more apples!",
-    "Try another basket, this one's at maximum capacity!",
-    "No more room in this basket!",
-    "This basket is completely full!",
-    "The basket can't fit any more apples!"
+    "Wow! This basket is already full with 3 apples!",
+    "Oopsie! This basket can only hold 3 apples!",
+    "Let's try another basket - this one has all 3 apples it can hold!",
+    "This basket is happy with its 3 apples!",
+    "Three apples is just right for this basket!",
+    "This basket is giving you a high-five - it has all 3 apples it needs!"
   ]
 
   // Reset inactivity timer
@@ -236,7 +236,7 @@ function App() {
         if (basketCounts[basketIndex] >= maxApples) {
           console.log('Basket is full, returning apple to original position')
           const randomIndex = Math.floor(Math.random() * warningMessages.length)
-          setFlexiMessage(`${warningMessages[randomIndex]} (Max: ${maxApples} apples)`)
+          setFlexiMessage(warningMessages[randomIndex])
           
           if (messageTimeoutRef.current) {
             clearTimeout(messageTimeoutRef.current)
