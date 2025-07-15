@@ -11,14 +11,14 @@ function App() {
   const lastBasketUpdateRef = useRef(null)
   const [basketCounts, setBasketCounts] = useState([0, 0, 0, 0])
   const [visibleBaskets, setVisibleBaskets] = useState([true, true, true, true])
-  const [level, setLevel] = useState(4) // Start with 4 baskets
+  const [level, setLevel] = useState(5) // Start with blank page (5), then 4 baskets (4), etc.
   const messageTimeoutRef = useRef(null)
   const inactivityTimeoutRef = useRef(null)
   const hintTimeoutRef = useRef(null)
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
-  const [flexiMessage, setFlexiMessage] = useState("Divide the apples so every basket has the same number!")
+  const [flexiMessage, setFlexiMessage] = useState("I have a bunch of apples — how should we split them? Try 4, 3, 2, or 1 basket!")
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [customAnswer, setCustomAnswer] = useState("")
   const [apples, setApples] = useState(() => {
@@ -57,6 +57,7 @@ function App() {
     console.log('Getting max apples for level:', level)
     let maxApples;
     switch (level) {
+      case 5: maxApples = 0; break;  // blank page: no apples
       case 4: maxApples = 3; break;  // 4 baskets: 3 apples each
       case 3: maxApples = 4; break;  // 3 baskets: 4 apples each
       case 2: maxApples = 6; break;  // 2 baskets: 6 apples each
@@ -400,8 +401,11 @@ function App() {
     )
     
     const newVisibleBaskets = Array(4).fill(false)
-    for (let i = 0; i < level - 1; i++) {
-      newVisibleBaskets[i] = true
+    // Only show baskets for levels 4-1
+    if (level - 1 >= 1 && level - 1 <= 4) {
+      for (let i = 0; i < level - 1; i++) {
+        newVisibleBaskets[i] = true
+      }
     }
     setVisibleBaskets(newVisibleBaskets)
     
@@ -417,11 +421,13 @@ function App() {
     setFollowUpReaction(null)
     setShowFinalMessage(false)
     
-    // Special message for 0 baskets
-    if (level === 1) {  // When level is 1, we're moving to 0
+    // Set appropriate messages for each level transition
+    if (level === 1) {  // Moving to 0 baskets
       setFlexiMessage("Oh no! Where did all the baskets go?")
-    } else if (level === 2) {  // When level is 2, we're moving to 1
+    } else if (level === 2) {  // Moving to 1 basket
       setFlexiMessage("Now try putting all the apples in one basket!")
+    } else if (level === 5) {  // Moving from blank to 4 baskets
+      setFlexiMessage("Let's start by dividing these apples between 4 baskets!")
     } else {
       setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
     }
@@ -429,7 +435,7 @@ function App() {
 
   // Handle back button click
   const handleBack = () => {
-    if (level >= 4) return
+    if (level >= 5) return
     
     // Reset apples to original positions
     setApples(prevApples => 
@@ -442,10 +448,12 @@ function App() {
       }))
     )
     
-    // Show all baskets for the new level
+    // Show baskets only for levels 1-4
     const newVisibleBaskets = Array(4).fill(false)
-    for (let i = 0; i < level + 1; i++) {
-      newVisibleBaskets[i] = true
+    if (level + 1 >= 1 && level + 1 <= 4) {
+      for (let i = 0; i < level + 1; i++) {
+        newVisibleBaskets[i] = true
+      }
     }
     setVisibleBaskets(newVisibleBaskets)
     
@@ -464,9 +472,11 @@ function App() {
     setFollowUpReaction(null)
     setShowFinalMessage(false)
     
-    // Special message when coming back from 0 baskets
-    if (level === 0) {
+    // Set appropriate messages for each level transition
+    if (level === 0) {  // Moving back to 1 basket
       setFlexiMessage("Phew! We got a basket back. Now we can divide again!")
+    } else if (level === 4) {  // Moving back to blank page
+      setFlexiMessage("I have a bunch of apples — how should we split them? Try 4, 3, 2, or 1 basket!")
     } else {
       setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
     }
@@ -523,14 +533,14 @@ function App() {
   return (
     <div 
       ref={containerRef} 
-      className={`container ${level === 0 ? 'no-baskets' : ''}`}
+      className={`container ${level === 0 ? 'no-baskets' : ''} ${level === 5 ? 'blank-page' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
       <h1 className="title">Division by Zero</h1>
       <div className="interactive-area">
-        {apples.map((apple) => (
+        {level !== 5 && apples.map((apple) => (
           <div 
             key={apple.id}
             className={`apple ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
@@ -549,7 +559,7 @@ function App() {
           </div>
         ))}
         <div className="baskets-container">
-          {visibleBaskets.map((isVisible, index) => 
+          {level !== 5 && visibleBaskets.map((isVisible, index) => 
             isVisible && (
               <div key={index} className="basket">
                 <div className="basket-body">
@@ -563,13 +573,9 @@ function App() {
         </div>
         <img 
           src={(() => {
-            console.log('Debug Flexi States:', {
-              level,
-              flexiMessage,
-              flexiResponse,
-              showFollowUpMessage,
-              selectedAnswer
-            });
+            if (level === 5) {
+              return flexiImage;  // Show default Flexi on blank page
+            }
             
             if (level === 0) {
               // Initial "Where did the baskets go?" message
@@ -702,6 +708,26 @@ function App() {
                 (Click to try another answer)
               </div>
             </div>
+          ) : level === 5 ? (
+            <>
+              <div className="welcome-message">
+                {flexiMessage}
+              </div>
+              <div className="start-options">
+                <button 
+                  className="start-option"
+                  onClick={handleForward}
+                >
+                  Let's get sorting! 🍎
+                </button>
+                <button 
+                  className="start-option"
+                  onClick={handleForward}
+                >
+                  Challenge accepted! 💪
+                </button>
+              </div>
+            </>
           ) : (
             flexiMessage
           )}
@@ -710,7 +736,7 @@ function App() {
           <button 
             className="nav-button" 
             onClick={handleBack}
-            disabled={level >= 4}
+            disabled={level >= 5}
           >
             &lt;
           </button>

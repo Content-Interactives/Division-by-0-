@@ -593,3 +593,61 @@ body {
 .undefined {
   font-style: italic;
 }
+
+.blank-page .interactive-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.blank-page .flexi {
+  position: static !important;
+  margin-bottom: 20px;
+}
+
+.blank-page .flexi-speech-bubble {
+  position: static !important;
+  transform: none !important;
+  max-width: 400px;  /* Reduced from 500px */
+  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  font-size: 1em;  /* Reduced from 1.2em */
+  line-height: 1.5;
+}
+
+.welcome-message {
+  font-size: 1.1em;  /* Reduced from 1.3em */
+  line-height: 1.5;  /* Reduced from 1.6 */
+  margin-bottom: 25px;  /* Reduced from 30px */
+  white-space: pre-line;
+}
+
+.start-options {
+  display: flex;
+  gap: 15px;  /* Reduced from 20px */
+  justify-content: center;
+  margin-top: 20px;  /* Reduced from 30px */
+}
+
+.start-option {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 25px;  /* Reduced from 15px 30px */
+  border-radius: 20px;  /* Reduced from 25px */
+  font-size: 1.1em;  /* Reduced from 1.2em */
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.start-option:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.start-option:active {
+  transform: translateY(0);
+}
