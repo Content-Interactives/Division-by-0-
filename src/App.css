@@ -727,3 +727,19 @@ body {
   0%, 100% { transform: rotate(-5deg); }
   50% { transform: rotate(5deg); }
 }
+
+/* Mobile responsive scaling */
+@media (max-width: 600px) {
+  body {
+    overflow-x: hidden;
+    justify-content: flex-start; /* remove center to prevent overflow */
+    align-items: flex-start;
+  }
+  .container {
+    --scale: calc(100vw / 600);
+    width: 600px;
+    height: 600px;
+    transform: scale(var(--scale));
+    transform-origin: top left;
+  }
+}

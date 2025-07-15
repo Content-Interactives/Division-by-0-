@@ -588,6 +588,8 @@ function App() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onPointerMove={handleMouseMove}
+      onPointerUp={handleMouseUp}
     >
       <h1 className="title">Division by Zero</h1>
       <div className="interactive-area">
@@ -605,6 +607,7 @@ function App() {
               touchAction: 'none'
             }}
             onMouseDown={(e) => handleMouseDown(e, apple.id)}
+            onPointerDown={(e) => handleMouseDown(e, apple.id)}
           >
             {apple.content}
           </div>
