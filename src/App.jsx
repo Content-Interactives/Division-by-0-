@@ -51,6 +51,30 @@ function App() {
   const [showFollowUpMessage, setShowFollowUpMessage] = useState(false)
   const [followUpReaction, setFollowUpReaction] = useState(null)
   const [showFinalMessage, setShowFinalMessage] = useState(false)
+  const [customAnswerError, setCustomAnswerError] = useState("")
+
+  // Add this near the top with other state variables
+  const inappropriateWords = [
+    'fuck', 'shit', 'damn', 'ass', 'bitch', 'crap', 'piss', 'dick', 'cock', 'pussy', 'bastard',
+    'hell', 'whore', 'slut', 'prick', 'cunt', 'asshole', 'fag', 'retard', 'nigger', 'nigga'
+  ]
+
+  const containsInappropriateWord = (text) => {
+    const words = text.toLowerCase().split(/\s+/)
+    return words.some(word => 
+      inappropriateWords.some(badWord => 
+        word.includes(badWord) || 
+        // Check for common letter substitutions
+        word.replace(/[1!|]/g, 'i')
+           .replace(/[3]/g, 'e')
+           .replace(/[4@]/g, 'a')
+           .replace(/[5]/g, 's')
+           .replace(/[0]/g, 'o')
+           .replace(/[$]/g, 's')
+           .includes(badWord)
+      )
+    )
+  }
 
   // Get max apples per basket based on level
   const getMaxApplesPerBasket = () => {
@@ -490,17 +514,23 @@ function App() {
     }
   }
 
-  const handleCustomAnswerSubmit = () => {
-    if (customAnswer.trim()) {
-      setSelectedAnswer('custom')
-      setFlexiResponse(getFlexiResponse('custom', customAnswer))
-    }
-  }
-
-  // Modify the handleCustomAnswerChange to not trigger the response immediately
   const handleCustomAnswerChange = (e) => {
     const text = e.target.value
     setCustomAnswer(text)
+    // Clear error when user starts typing again
+    setCustomAnswerError("")
+  }
+
+  const handleCustomAnswerSubmit = () => {
+    if (customAnswer.trim()) {
+      if (containsInappropriateWord(customAnswer)) {
+        setCustomAnswerError("Please keep your answer family-friendly! 🌟")
+        return
+      }
+      setCustomAnswerError("")
+      setSelectedAnswer('custom')
+      setFlexiResponse(getFlexiResponse('custom', customAnswer))
+    }
   }
 
   // Add a function to reset the response
@@ -635,6 +665,11 @@ function App() {
                         }
                       }}
                     />
+                    {customAnswerError && (
+                      <div className="custom-answer-error">
+                        {customAnswerError}
+                      </div>
+                    )}
                   </div>
                   <button 
                     className="custom-answer-submit"
@@ -654,18 +689,37 @@ function App() {
                     {flexiResponse}
                   </div>
                   <div className="reaction-buttons">
-                    <button 
-                      className={`reaction-button ${selectedReaction === 'thanks' ? 'selected' : ''}`}
-                      onClick={() => handleReactionSelect('thanks')}
-                    >
-                      Thanks! 😊
-                    </button>
-                    <button 
-                      className={`reaction-button ${selectedReaction === 'imagination' ? 'selected' : ''}`}
-                      onClick={() => handleReactionSelect('imagination')}
-                    >
-                      I just used my imagination! ✨
-                    </button>
+                    {selectedAnswer === 'custom' ? (
+                      <>
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'thanks' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('thanks')}
+                        >
+                          Thanks! 😊
+                        </button>
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'imagination' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('imagination')}
+                        >
+                          I just used my imagination! ✨
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'haha' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('haha')}
+                        >
+                          Haha definitely!
+                        </button>
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'perhaps' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('perhaps')}
+                        >
+                          Perhaps so!
+                        </button>
+                      </>
+                    )}
                   </div>
                 </>
               ) : !showFinalMessage ? (

@@ -651,3 +651,12 @@ body {
 .start-option:active {
   transform: translateY(0);
 }
+
+.custom-answer-error {
+  color: #d32f2f;
+  font-size: 0.9em;
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 4px;
+  background-color: rgba(211, 47, 47, 0.1);
+}
