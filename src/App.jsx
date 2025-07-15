@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
 import flexiImage from './assets/Flexi_ThumbsUp (1).png'
+import flexiWoahImage from '/images/Flexi_Woah.png'
+import flexiExcitedImage from '/images/Flexi_Excited.png'
 
 function App() {
   const containerRef = useRef(null)
@@ -543,7 +545,29 @@ function App() {
           )}
         </div>
         <img 
-          src={flexiImage}
+          src={(() => {
+            console.log('Debug Flexi States:', {
+              level,
+              flexiMessage,
+              flexiResponse,
+              showFollowUpMessage,
+              selectedAnswer
+            });
+            
+            if (level === 0) {
+              // Initial "Where did the baskets go?" message
+              if (flexiMessage === "Oh no! Where did all the baskets go?" && !selectedAnswer && !flexiResponse) {
+                return flexiWoahImage;
+              }
+              // Show excited Flexi during answer options and initial response
+              if (!showFollowUpMessage) {
+                return flexiExcitedImage;
+              }
+              // Show original Flexi for follow-up messages
+              return flexiImage;
+            }
+            return flexiImage;
+          })()}
           alt="Flexi character" 
           className="flexi"
         />
