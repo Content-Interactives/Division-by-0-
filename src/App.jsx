@@ -397,7 +397,7 @@ function App() {
           )}
         </div>
         <img 
-          src="/Flexi_ThumbsUp (1).png" 
+          src="/divby0apple/Flexi_ThumbsUp (1).png" 
           alt="Flexi character" 
           className="flexi"
         />
