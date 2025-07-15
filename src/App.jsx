@@ -370,7 +370,7 @@ function App() {
     
     // Special message for 0 baskets
     if (level === 1) {
-      setFlexiMessage("Oh no! Where did all the baskets go? We can't divide by zero!")
+      setFlexiMessage("Oh no! Where did all the baskets go?")
     } else {
       setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
     }
