@@ -3,6 +3,8 @@ import './App.css'
 import flexiImage from './assets/Flexi_ThumbsUp (1).png'
 import flexiWoahImage from '/images/Flexi_Woah.png'
 import flexiExcitedImage from '/images/Flexi_Excited.png'
+import flexiIdeaImage from '/images/Flexi_Idea.png'
+import flexiStarsImage from '/images/Flexi_Stars.png'
 
 function App() {
   const containerRef = useRef(null)
@@ -223,6 +225,15 @@ function App() {
     }
   }, [level, basketCounts])
 
+  const motivationalMessages = [
+    "You're doing great! Keep going! ⭐",
+    "That's the way! You're getting it! 🌟",
+    "Nice work with those apples! ✨",
+    "You're making this look easy! 🌠",
+    "Keep going, you're on the right track! ⭐",
+    "Wonderful job dividing those apples! 🌟"
+  ]
+
   const handleMouseDown = (e, id) => {
     const apple = e.target
     const rect = apple.getBoundingClientRect()
@@ -232,6 +243,12 @@ function App() {
     setHighlightedAppleId(null)
     setIsShowingHint(false)
     resetInactivityTimer()
+
+    // Show random motivational message when picking up an apple
+    if (level !== 0) {
+      const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]
+      setFlexiMessage(randomMessage)
+    }
 
     setApples(prevApples =>
       prevApples.map(a =>
@@ -563,8 +580,17 @@ function App() {
               if (!showFollowUpMessage) {
                 return flexiExcitedImage;
               }
-              // Show original Flexi for follow-up messages
+              // Show idea Flexi during the follow-up message about division
+              if (showFollowUpMessage && !showFinalMessage) {
+                return flexiIdeaImage;
+              }
+              // Show original Flexi for final message
               return flexiImage;
+            }
+            // Show stars Flexi when user is actively placing apples
+            const isDraggingApple = apples.some(apple => apple.isDragging);
+            if (isDraggingApple) {
+              return flexiStarsImage;
             }
             return flexiImage;
           })()}
