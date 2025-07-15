@@ -602,7 +602,9 @@ body {
 }
 
 .blank-page .flexi {
-  position: static !important;
+  position: relative !important; /* allow offsets */
+  left: 50px; /* move Flexi to the right */
+  top: 20px; /* move Flexi down */
   margin-bottom: 20px;
 }
 
@@ -659,4 +661,69 @@ body {
   padding: 5px;
   border-radius: 4px;
   background-color: rgba(211, 47, 47, 0.1);
+}
+
+.apple-tree {
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  height: 400px;
+  width: 200px;
+  display: none;
+}
+
+.blank-page .apple-tree {
+  display: block;
+}
+
+.tree-trunk {
+  position: absolute;
+  bottom: 0;
+  left: 80%;  /* Changed from 65% to move trunk even more right */
+  transform: translateX(-50%);
+  width: 40px;
+  height: 370px;  /* Set trunk height to 370px */
+  background: linear-gradient(90deg, #8B4513 10%, #A0522D 50%, #8B4513 90%);
+  border-radius: 10px 10px 0 0;
+}
+
+.tree-crown {
+  position: absolute;
+  bottom: 350px;  /* Adjusted to sit on top of 370px trunk */
+  left: 80%;  /* Changed from 65% to match new trunk position */
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at center, #228B22 0%, #006400 100%);
+  border-radius: 50% 50% 50% 50%;
+  box-shadow: 
+    -20px -20px 0 #228B22,
+    20px -20px 0 #228B22,
+    -10px 20px 0 #228B22,
+    10px 20px 0 #228B22;
+}
+
+.tree-apple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: sway 3s ease-in-out infinite;
+}
+
+.tree-apple:nth-child(1) { left: 30%; top: 20%; animation-delay: 0s; }
+.tree-apple:nth-child(2) { left: 60%; top: 30%; animation-delay: 0.5s; }
+.tree-apple:nth-child(3) { left: 40%; top: 50%; animation-delay: 1s; }
+.tree-apple:nth-child(4) { left: 70%; top: 60%; animation-delay: 1.5s; }
+.tree-apple:nth-child(5) { left: 20%; top: 40%; animation-delay: 2s; }
+.tree-apple:nth-child(6) { left: 5%; top: 35%; animation-delay: 2.5s; }
+.tree-apple:nth-child(7) { left: 85%; top: 25%; animation-delay: 3s; }
+.tree-apple:nth-child(8) { left: 45%; top: 10%; animation-delay: 3.5s; }
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
 }

@@ -5,6 +5,7 @@ import flexiWoahImage from '/images/Flexi_Woah.png'
 import flexiExcitedImage from '/images/Flexi_Excited.png'
 import flexiIdeaImage from '/images/Flexi_Idea.png'
 import flexiStarsImage from '/images/Flexi_Stars.png'
+import flexiPointImage from '/images/Flexi_Point.png'
 
 function App() {
   const containerRef = useRef(null)
@@ -18,7 +19,7 @@ function App() {
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
-  const [flexiMessage, setFlexiMessage] = useState("I have a bunch of apples — how should we split them? Try 4, 3, 2, or 1 basket!")
+  const [flexiMessage, setFlexiMessage] = useState("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket!")
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [customAnswer, setCustomAnswer] = useState("")
   const [apples, setApples] = useState(() => {
@@ -500,7 +501,7 @@ function App() {
     if (level === 0) {  // Moving back to 1 basket
       setFlexiMessage("Phew! We got a basket back. Now we can divide again!")
     } else if (level === 4) {  // Moving back to blank page
-      setFlexiMessage("I have a bunch of apples — how should we split them? Try 4, 3, 2, or 1 basket!")
+      setFlexiMessage("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket!")
     } else {
       setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
     }
@@ -601,10 +602,24 @@ function App() {
             )
           )}
         </div>
+        <div className="apple-tree">
+          <div className="tree-trunk"></div>
+          <div className="tree-crown">
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+            <div className="tree-apple">🍎</div>
+          </div>
+        </div>
         <img 
           src={(() => {
             if (level === 5) {
-              return flexiImage;  // Show default Flexi on blank page
+              return flexiPointImage;  // Show pointing Flexi on blank page
             }
             
             if (level === 0) {
