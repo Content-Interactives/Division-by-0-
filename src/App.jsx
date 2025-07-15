@@ -15,6 +15,8 @@ function App() {
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
   const [flexiMessage, setFlexiMessage] = useState("Divide the apples so every basket has the same number!")
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
+  const [customAnswer, setCustomAnswer] = useState("")
   const [apples, setApples] = useState(() => {
     const GRID_COLS = 6
     const GRID_ROWS = 2
@@ -40,6 +42,11 @@ function App() {
       }
     })
   })
+  const [flexiResponse, setFlexiResponse] = useState("")
+  const [selectedReaction, setSelectedReaction] = useState(null)
+  const [showFollowUpMessage, setShowFollowUpMessage] = useState(false)
+  const [followUpReaction, setFollowUpReaction] = useState(null)
+  const [showFinalMessage, setShowFinalMessage] = useState(false)
 
   // Get max apples per basket based on level
   const getMaxApplesPerBasket = () => {
@@ -76,6 +83,20 @@ function App() {
     "Super duper! You're great at sharing apples equally! 🌈",
     "Yay! You did it! Each basket has the same number of apples! 🎈"
   ]
+
+  const getFlexiResponse = (answer, customText = "") => {
+    switch(answer) {
+      case 'circus':
+        return "Wow, joining the circus? I bet they're great at balancing acts! 🎪 Maybe they'll teach the apples some juggling tricks! 🤹‍♂️"
+      case 'hide-seek':
+        return "Ooh, sneaky baskets! Should we count to 10 and go find them? Ready or not, here we come! 👀"
+      case 'custom':
+        if (!customText.trim()) return ""
+        return `${customText}? That's such a creative idea! I never would have thought of that! 🌟`
+      default:
+        return ""
+    }
+  }
 
   // Check if apples are evenly distributed
   const checkEvenDistribution = () => {
@@ -368,9 +389,20 @@ function App() {
     setBasketCounts(new Array(4).fill(0))
     setLevel(prev => prev - 1)
     
+    // Reset answer states when navigating
+    setSelectedAnswer(null)
+    setCustomAnswer("")
+    setFlexiResponse("")
+    setSelectedReaction(null)
+    setShowFollowUpMessage(false)
+    setFollowUpReaction(null)
+    setShowFinalMessage(false)
+    
     // Special message for 0 baskets
-    if (level === 1) {
+    if (level === 1) {  // When level is 1, we're moving to 0
       setFlexiMessage("Oh no! Where did all the baskets go?")
+    } else if (level === 2) {  // When level is 2, we're moving to 1
+      setFlexiMessage("Now try putting all the apples in one basket!")
     } else {
       setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
     }
@@ -404,12 +436,67 @@ function App() {
     // Update level and message
     setLevel(prev => prev + 1)
     
+    // Reset answer states when navigating
+    setSelectedAnswer(null)
+    setCustomAnswer("")
+    setFlexiResponse("")
+    setSelectedReaction(null)
+    setShowFollowUpMessage(false)
+    setFollowUpReaction(null)
+    setShowFinalMessage(false)
+    
     // Special message when coming back from 0 baskets
     if (level === 0) {
       setFlexiMessage("Phew! We got a basket back. Now we can divide again!")
     } else {
       setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
     }
+  }
+
+  const handleAnswerSelect = (answer) => {
+    setSelectedAnswer(answer)
+    if (answer !== 'custom') {
+      setCustomAnswer("") // Clear custom answer when selecting a preset option
+      setFlexiResponse(getFlexiResponse(answer))
+    }
+  }
+
+  const handleCustomAnswerChange = (e) => {
+    const text = e.target.value
+    setCustomAnswer(text)
+    setSelectedAnswer('custom')
+    if (text.trim()) {
+      setFlexiResponse(getFlexiResponse('custom', text))
+    } else {
+      setFlexiResponse("")
+    }
+  }
+
+  // Add a function to reset the response
+  const handleResetResponse = () => {
+    setSelectedAnswer(null)
+    setCustomAnswer("")
+    setFlexiResponse("")
+    setSelectedReaction(null)
+    setShowFollowUpMessage(false)
+    setFollowUpReaction(null)
+    setShowFinalMessage(false)
+  }
+
+  const handleReactionSelect = (reaction) => {
+    setSelectedReaction(reaction)
+    // Show follow-up message after a short delay
+    setTimeout(() => {
+      setShowFollowUpMessage(true)
+    }, 500)
+  }
+
+  const handleFollowUpReaction = (reaction) => {
+    setFollowUpReaction(reaction)
+    // Show final message after a short delay
+    setTimeout(() => {
+      setShowFinalMessage(true)
+    }, 500)
   }
 
   return (
@@ -459,7 +546,99 @@ function App() {
           className="flexi"
         />
         <div className="flexi-speech-bubble">
-          {flexiMessage}
+          {level === 0 && !flexiResponse ? (
+            <>
+              {flexiMessage}
+              <div className="answer-options">
+                <button 
+                  className={`answer-option ${selectedAnswer === 'circus' ? 'selected' : ''}`}
+                  onClick={() => handleAnswerSelect('circus')}
+                >
+                  They ran away to join the circus! 🎪
+                </button>
+                <button 
+                  className={`answer-option ${selectedAnswer === 'hide-seek' ? 'selected' : ''}`}
+                  onClick={() => handleAnswerSelect('hide-seek')}
+                >
+                  They're playing hide-and-seek
+                </button>
+                <div>
+                  <p className="answer-label">Or type your own answer:</p>
+                  <input
+                    type="text"
+                    className="custom-answer-input"
+                    value={customAnswer}
+                    onChange={handleCustomAnswerChange}
+                    placeholder="What do you think?"
+                  />
+                </div>
+              </div>
+            </>
+          ) : level === 0 ? (
+            <div className="flexi-response-container">
+              {!showFollowUpMessage ? (
+                <>
+                  <div className="flexi-response-message">
+                    {flexiResponse}
+                  </div>
+                  <div className="reaction-buttons">
+                    <button 
+                      className={`reaction-button ${selectedReaction === 'haha' ? 'selected' : ''}`}
+                      onClick={() => handleReactionSelect('haha')}
+                    >
+                      Haha definitely! 😄
+                    </button>
+                    <button 
+                      className={`reaction-button ${selectedReaction === 'perhaps' ? 'selected' : ''}`}
+                      onClick={() => handleReactionSelect('perhaps')}
+                    >
+                      Perhaps so! 🤔
+                    </button>
+                  </div>
+                </>
+              ) : !showFinalMessage ? (
+                <>
+                  <div className="flexi-response-message follow-up">
+                    No baskets means we have nowhere to put the apples!<br/>
+                    And that means we can't divide them
+                  </div>
+                  <div className="reaction-buttons">
+                    <button 
+                      className={`reaction-button ${followUpReaction === 'got-it' ? 'selected' : ''}`}
+                      onClick={() => handleFollowUpReaction('got-it')}
+                    >
+                      Got it! 👍
+                    </button>
+                    <button 
+                      className={`reaction-button ${followUpReaction === 'makes-sense' ? 'selected' : ''}`}
+                      onClick={() => handleFollowUpReaction('makes-sense')}
+                    >
+                      Makes sense! ✨
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flexi-response-message final">
+                  This is what happens when we try to divide by zero –<br/>
+                  it just doesn't make sense!
+                  <div className="fraction-container">
+                    <div className="fraction">
+                      <div className="numerator">12</div>
+                      <div className="fraction-line"></div>
+                      <div className="denominator">0</div>
+                    </div>
+                    <div className="equals">=</div>
+                    <div className="undefined">Undefined</div>
+                  </div>
+                </div>
+              )}
+              <div className="response-hint" onClick={handleResetResponse}>
+                (Click to try another answer)
+              </div>
+            </div>
+          ) : (
+            flexiMessage
+          )}
         </div>
         <div className="nav-buttons">
           <button 

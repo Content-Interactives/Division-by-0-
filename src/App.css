@@ -211,8 +211,8 @@ body {
 
 /* Add styles for when no baskets are visible */
 .no-baskets .flexi-speech-bubble {
-  bottom: 45%;
-  left: calc(35% + 80px);  /* Adjusted to match Flexi's new left position */
+  bottom: 35%;  /* Adjusted from 45% to 35% to move it lower */
+  left: calc(35% + 80px);
   transform: translateY(50%);
 }
 
@@ -232,6 +232,114 @@ body {
   transform: none;
   border-width: 10px 10px 10px 0;
   border-color: transparent white transparent transparent;
+}
+
+.flexi-response-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-in-out;
+  min-height: 120px;  /* Add minimum height to keep consistent spacing */
+}
+
+.flexi-response-message {
+  font-family: "proxima-nova", sans-serif;
+  font-size: 1rem;
+  margin-top: 0;  /* Reset margin to ensure consistent positioning */
+}
+
+.flexi-response-message.follow-up {
+  animation: fadeIn 0.5s ease-in-out;
+  text-align: center;
+  line-height: 1.5;
+  margin-top: 0;  /* Reset margin to ensure consistent positioning */
+}
+
+.flexi-response-message.final {
+  animation: fadeIn 0.5s ease-in-out;
+  text-align: center;
+  line-height: 1.5;
+  font-weight: 500;
+  margin-top: 0;  /* Reset margin to ensure consistent positioning */
+}
+
+/* Add consistent top margin to the initial message */
+.no-baskets .flexi-speech-bubble > :first-child {
+  margin-top: 0;
+}
+
+.reaction-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.reaction-button {
+  background-color: white;
+  border: 2px solid #FF6B00;
+  border-radius: 15px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.9rem;
+  color: #FF6B00;
+}
+
+.reaction-button:hover {
+  background-color: #FFF3E0;
+  transform: scale(1.02);
+}
+
+.reaction-button.selected {
+  background-color: #FF6B00;
+  color: white;
+}
+
+.response-hint {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 4px;
+  font-style: italic;
+  text-align: center;
+  cursor: pointer;
+}
+
+.response-hint:hover {
+  color: #666;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.flexi-response {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #FFF3E0;
+  border-radius: 12px;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.9rem;
+  color: #FF6B00;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .basket {
@@ -348,4 +456,95 @@ body {
   background-color: #ccc;
   cursor: not-allowed;
   transform: none;
+}
+
+.answer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.answer-option {
+  background-color: white;
+  border: 2px solid #FF6B00;
+  border-radius: 15px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.answer-option:hover {
+  background-color: #FF6B00;
+  color: white;
+  transform: scale(1.02);
+}
+
+.answer-option.selected {
+  background-color: #FF6B00;
+  color: white;
+}
+
+.custom-answer-input {
+  width: 100%;
+  background-color: white;
+  border: 2px solid #FF6B00;
+  border-radius: 15px;
+  padding: 10px 15px;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.custom-answer-input:focus {
+  border-color: #FF6B00;
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+}
+
+.answer-label {
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.fraction-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+  font-size: 1.2rem;
+  font-family: "proxima-nova", sans-serif;
+}
+
+.fraction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.numerator, .denominator {
+  padding: 2px 8px;
+}
+
+.fraction-line {
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  min-width: 25px;
+}
+
+.equals {
+  margin: 0 4px;
+}
+
+.undefined {
+  font-style: italic;
 }
