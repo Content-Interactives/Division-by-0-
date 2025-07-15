@@ -109,7 +109,7 @@ body {
 /* Add styles for when no baskets are visible */
 .no-baskets .flexi {
   bottom: 45%;
-  left: 35%;  /* Changed from 45% to 35% to move Flexi further left */
+  left: 30%;  /* Changed from 35% to 30% to move Flexi more left */
   transform: translate(-50%, 50%);
 }
 
@@ -211,9 +211,14 @@ body {
 
 /* Add styles for when no baskets are visible */
 .no-baskets .flexi-speech-bubble {
-  bottom: 35%;  /* Adjusted from 45% to 35% to move it lower */
-  left: calc(35% + 80px);
+  bottom: 30%;
+  left: calc(30% + 80px);  /* Changed from 35% to 30% to match Flexi's position */
   transform: translateY(50%);
+}
+
+/* Add padding to the top of the initial message content */
+.flexi-speech-bubble > :first-child {
+  padding-top: 10px;
 }
 
 .flexi-speech-bubble::after {
@@ -463,6 +468,7 @@ body {
   flex-direction: column;
   gap: 10px;
   margin-top: 15px;
+  padding-top: 5px;  /* Add some padding at the top of options */
 }
 
 .answer-option {
@@ -488,6 +494,13 @@ body {
   color: white;
 }
 
+.custom-answer-container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .custom-answer-input {
   width: 100%;
   background-color: white;
@@ -498,6 +511,38 @@ body {
   font-size: 0.9rem;
   transition: all 0.2s ease-in-out;
   outline: none;
+}
+
+.custom-answer-submit {
+  background-color: white;
+  border: 2px solid #FF6B00;
+  border-radius: 12px;
+  padding: 4px 12px;  /* Increased horizontal padding */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.8rem;
+  color: #FF6B00;
+  white-space: nowrap;
+  margin-top: 8px;
+  width: 32%;  /* Slightly increased width */
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;  /* Ensure text is centered */
+  min-width: 70px;  /* Ensure minimum width to fit text */
+}
+
+.custom-answer-submit:hover:not(:disabled) {
+  background-color: #FF6B00;
+  color: white;
+  transform: scale(1.02);
+}
+
+.custom-answer-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #ccc;
+  color: #999;
 }
 
 .custom-answer-input:focus {

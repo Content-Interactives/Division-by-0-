@@ -461,15 +461,17 @@ function App() {
     }
   }
 
+  const handleCustomAnswerSubmit = () => {
+    if (customAnswer.trim()) {
+      setSelectedAnswer('custom')
+      setFlexiResponse(getFlexiResponse('custom', customAnswer))
+    }
+  }
+
+  // Modify the handleCustomAnswerChange to not trigger the response immediately
   const handleCustomAnswerChange = (e) => {
     const text = e.target.value
     setCustomAnswer(text)
-    setSelectedAnswer('custom')
-    if (text.trim()) {
-      setFlexiResponse(getFlexiResponse('custom', text))
-    } else {
-      setFlexiResponse("")
-    }
   }
 
   // Add a function to reset the response
@@ -564,13 +566,27 @@ function App() {
                 </button>
                 <div>
                   <p className="answer-label">Or type your own answer:</p>
-                  <input
-                    type="text"
-                    className="custom-answer-input"
-                    value={customAnswer}
-                    onChange={handleCustomAnswerChange}
-                    placeholder="What do you think?"
-                  />
+                  <div className="custom-answer-container">
+                    <input
+                      type="text"
+                      className="custom-answer-input"
+                      value={customAnswer}
+                      onChange={handleCustomAnswerChange}
+                      placeholder="What do you think?"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCustomAnswerSubmit()
+                        }
+                      }}
+                    />
+                  </div>
+                  <button 
+                    className="custom-answer-submit"
+                    onClick={handleCustomAnswerSubmit}
+                    disabled={!customAnswer.trim()}
+                  >
+                    Submit ✨
+                  </button>
                 </div>
               </div>
             </>
@@ -583,16 +599,16 @@ function App() {
                   </div>
                   <div className="reaction-buttons">
                     <button 
-                      className={`reaction-button ${selectedReaction === 'haha' ? 'selected' : ''}`}
-                      onClick={() => handleReactionSelect('haha')}
+                      className={`reaction-button ${selectedReaction === 'thanks' ? 'selected' : ''}`}
+                      onClick={() => handleReactionSelect('thanks')}
                     >
-                      Haha definitely! 😄
+                      Thanks! 😊
                     </button>
                     <button 
-                      className={`reaction-button ${selectedReaction === 'perhaps' ? 'selected' : ''}`}
-                      onClick={() => handleReactionSelect('perhaps')}
+                      className={`reaction-button ${selectedReaction === 'imagination' ? 'selected' : ''}`}
+                      onClick={() => handleReactionSelect('imagination')}
                     >
-                      Perhaps so! 🤔
+                      I just used my imagination! ✨
                     </button>
                   </div>
                 </>
@@ -604,16 +620,16 @@ function App() {
                   </div>
                   <div className="reaction-buttons">
                     <button 
-                      className={`reaction-button ${followUpReaction === 'got-it' ? 'selected' : ''}`}
-                      onClick={() => handleFollowUpReaction('got-it')}
+                      className={`reaction-button ${followUpReaction === 'understand' ? 'selected' : ''}`}
+                      onClick={() => handleFollowUpReaction('understand')}
                     >
-                      Got it! 👍
+                      I understand now! 💡
                     </button>
                     <button 
-                      className={`reaction-button ${followUpReaction === 'makes-sense' ? 'selected' : ''}`}
-                      onClick={() => handleFollowUpReaction('makes-sense')}
+                      className={`reaction-button ${followUpReaction === 'interesting' ? 'selected' : ''}`}
+                      onClick={() => handleFollowUpReaction('interesting')}
                     >
-                      Makes sense! ✨
+                      That's interesting! 🤔
                     </button>
                   </div>
                 </>
