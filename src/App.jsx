@@ -75,15 +75,27 @@ function App() {
     }
     
     setIsShowingHint(false)
+    setHighlightedAppleId(null)
     
-    // Only set timer if we're on the 4-basket page
+    // Only set timer if we're on the 4-basket page and no interaction has occurred
     if (level === 4) {
       inactivityTimeoutRef.current = setTimeout(() => {
+        // Don't show highlight if there's been any interaction
+        if (basketCounts.some(count => count > 0)) {
+          return;
+        }
+        
         // Highlight the first apple in the second row (index 6)
         setHighlightedAppleId(6)
         
         // Start hint animation after highlighting
         hintTimeoutRef.current = setTimeout(() => {
+          // Don't show hint if there's been any interaction
+          if (basketCounts.some(count => count > 0)) {
+            setHighlightedAppleId(null);
+            return;
+          }
+          
           const basketElement = document.querySelector('.basket')
           if (basketElement) {
             const basketRect = basketElement.getBoundingClientRect()
@@ -120,8 +132,18 @@ function App() {
   // Add event listeners for user activity
   useEffect(() => {
     const handleActivity = () => {
-      setHighlightedAppleId(null)
-      setIsShowingHint(false)
+      // If there are any apples in baskets, permanently disable the highlight
+      if (basketCounts.some(count => count > 0)) {
+        setHighlightedAppleId(null)
+        setIsShowingHint(false)
+        if (inactivityTimeoutRef.current) {
+          clearTimeout(inactivityTimeoutRef.current)
+        }
+        if (hintTimeoutRef.current) {
+          clearTimeout(hintTimeoutRef.current)
+        }
+        return;
+      }
       resetInactivityTimer()
     }
 
@@ -140,7 +162,7 @@ function App() {
         clearTimeout(hintTimeoutRef.current)
       }
     }
-  }, [level])
+  }, [level, basketCounts])
 
   const handleMouseDown = (e, id) => {
     const apple = e.target
