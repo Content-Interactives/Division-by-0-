@@ -19,7 +19,7 @@ function App() {
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
-  const [flexiMessage, setFlexiMessage] = useState("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket!")
+  const [flexiMessage, setFlexiMessage] = useState("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket...but be careful with 0!")
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [customAnswer, setCustomAnswer] = useState("")
   const [apples, setApples] = useState(() => {
@@ -446,15 +446,26 @@ function App() {
     setFollowUpReaction(null)
     setShowFinalMessage(false)
     
-    // Set appropriate messages for each level transition
-    if (level === 1) {  // Moving to 0 baskets
-      setFlexiMessage("Oh no! Where did all the baskets go?")
-    } else if (level === 2) {  // Moving to 1 basket
+    // Predefined fun messages for each basket count
+    const basketMessages = {
+      4: "We have 4 baskets ready! Let's give each one the same number of apples!",
+      3: "Three baskets incoming! How can we share the apples out?",
+      2: "Let's try dividing the apples between 2 baskets!",
+      1: "One basket only — everything goes in here!",
+      0: "Oh no! Where did all the baskets go?"
+    }
+
+    const newLevel = level - 1
+
+    // Set message based on the resulting number of baskets (newLevel)
+    if (newLevel === 0) {
+      setFlexiMessage(basketMessages[0])
+    } else if (newLevel === 1) {
       setFlexiMessage("Now try putting all the apples in one basket!")
-    } else if (level === 5) {  // Moving from blank to 4 baskets
-      setFlexiMessage("Let's start by dividing these apples between 4 baskets!")
+    } else if (newLevel === 4) {
+      setFlexiMessage(basketMessages[4])
     } else {
-      setFlexiMessage(`Now try dividing the apples between ${level - 1} baskets!`)
+      setFlexiMessage(basketMessages[newLevel] || `Now try dividing the apples between ${newLevel} baskets!`)
     }
   }
 
@@ -497,13 +508,22 @@ function App() {
     setFollowUpReaction(null)
     setShowFinalMessage(false)
     
+    // Predefined fun messages for each basket count
+    const basketMessages = {
+      4: "We have 4 baskets ready! Let's give each one the same number of apples!",
+      3: "Three baskets incoming! How can we share the apples out?",
+      2: "Let's try dividing the apples between 2 baskets!",
+      1: "One basket only — everything goes in here!"
+    }
+
     // Set appropriate messages for each level transition
     if (level === 0) {  // Moving back to 1 basket
       setFlexiMessage("Phew! We got a basket back. Now we can divide again!")
     } else if (level === 4) {  // Moving back to blank page
-      setFlexiMessage("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket!")
+      setFlexiMessage("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket...but be careful with 0!")
     } else {
-      setFlexiMessage(`Let's try dividing the apples between ${level + 1} baskets!`)
+      // Use varied message based on the new basket count (level + 1)
+      setFlexiMessage(basketMessages[level + 1] || `Let's try dividing the apples between ${level + 1} baskets!`)
     }
   }
 
@@ -663,7 +683,7 @@ function App() {
                   className={`answer-option ${selectedAnswer === 'hide-seek' ? 'selected' : ''}`}
                   onClick={() => handleAnswerSelect('hide-seek')}
                 >
-                  They're playing hide-and-seek
+                  They're playing hide-and-seek! 🙈
                 </button>
                 <div>
                   <p className="answer-label">Or type your own answer:</p>
@@ -801,22 +821,24 @@ function App() {
             flexiMessage
           )}
         </div>
-        <div className="nav-buttons">
-          <button 
-            className="nav-button" 
-            onClick={handleBack}
-            disabled={level >= 5}
-          >
-            &lt;
-          </button>
-          <button 
-            className="nav-button" 
-            onClick={handleForward}
-            disabled={level <= 0}
-          >
-            &gt;
-          </button>
-        </div>
+        {level !== 5 && (
+          <div className="nav-buttons">
+            <button 
+              className="nav-button" 
+              onClick={handleBack}
+              disabled={level >= 5}
+            >
+              &lt;
+            </button>
+            <button 
+              className="nav-button" 
+              onClick={handleForward}
+              disabled={level <= 0}
+            >
+              &gt;
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
