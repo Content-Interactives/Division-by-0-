@@ -103,6 +103,14 @@ body {
   height: auto;
   pointer-events: none;
   z-index: 1;
+  transition: all 0.5s ease-in-out;
+}
+
+/* Add styles for when no baskets are visible */
+.no-baskets .flexi {
+  bottom: 45%;
+  left: 35%;  /* Changed from 45% to 35% to move Flexi further left */
+  transform: translate(-50%, 50%);
 }
 
 .flexi-body {
@@ -189,7 +197,7 @@ body {
 .flexi-speech-bubble {
   position: absolute;
   bottom: 80px;
-  left: 160px;  /* Moved from 100px to 160px to position it to the right of Flexi */
+  left: 160px;
   background-color: white;
   padding: 15px;
   border-radius: 20px;
@@ -198,6 +206,14 @@ body {
   font-size: 1rem;
   font-family: "proxima-nova", sans-serif;
   z-index: 2;
+  transition: all 0.5s ease-in-out;
+}
+
+/* Add styles for when no baskets are visible */
+.no-baskets .flexi-speech-bubble {
+  bottom: 45%;
+  left: calc(35% + 80px);  /* Adjusted to match Flexi's new left position */
+  transform: translateY(50%);
 }
 
 .flexi-speech-bubble::after {
@@ -208,6 +224,14 @@ body {
   border-width: 10px 10px 10px 0;  /* Changed border widths to point left */
   border-style: solid;
   border-color: transparent white transparent transparent;  /* Changed border colors to point left */
+}
+
+.no-baskets .flexi-speech-bubble::after {
+  left: -10px;
+  bottom: 20px;
+  transform: none;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent white transparent transparent;
 }
 
 .basket {

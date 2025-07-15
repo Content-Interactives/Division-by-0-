@@ -414,8 +414,8 @@ function App() {
 
   return (
     <div 
-      className="container" 
-      ref={containerRef}
+      ref={containerRef} 
+      className={`container ${level === 0 ? 'no-baskets' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
