@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import flexiImage from './assets/Flexi_ThumbsUp (1).png'
 
 function App() {
   const containerRef = useRef(null)
@@ -397,7 +398,7 @@ function App() {
           )}
         </div>
         <img 
-          src="/divby0apple/Flexi_ThumbsUp (1).png" 
+          src={flexiImage}
           alt="Flexi character" 
           className="flexi"
         />
