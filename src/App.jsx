@@ -57,14 +57,49 @@ function App() {
     return maxApples;
   }
 
-  const warningMessages = [
-    "Wow! This basket is already full with 3 apples!",
-    "Oopsie! This basket can only hold 3 apples!",
-    "Let's try another basket - this one has all 3 apples it can hold!",
-    "This basket is happy with its 3 apples!",
-    "Three apples is just right for this basket!",
-    "This basket is giving you a high-five - it has all 3 apples it needs!"
+  const getWarningMessage = (maxApples) => {
+    const messages = [
+      `Wow! This basket is already full with ${maxApples} apples!`,
+      `Oopsie! This basket can only hold ${maxApples} apples!`,
+      `Let's try another basket - this one has all ${maxApples} apples it can hold!`,
+      `This basket is happy with its ${maxApples} apples!`,
+      `${maxApples} apples is just right for this basket!`,
+      `This basket is giving you a high-five - it has all ${maxApples} apples it needs!`
+    ]
+    return messages[Math.floor(Math.random() * messages.length)]
+  }
+
+  const congratsMessages = [
+    "Fantastic job! All the baskets have the same number of apples! 🌟",
+    "Wow! You divided the apples equally - you're amazing at math! ⭐",
+    "High five! You made all the baskets have the same number of apples! 🎉",
+    "Super duper! You're great at sharing apples equally! 🌈",
+    "Yay! You did it! Each basket has the same number of apples! 🎈"
   ]
+
+  // Check if apples are evenly distributed
+  const checkEvenDistribution = () => {
+    // Get the number of visible baskets
+    const numVisibleBaskets = visibleBaskets.filter(Boolean).length
+    console.log('Number of visible baskets:', numVisibleBaskets)
+    
+    // For 4 baskets level, we expect 3 apples in each basket
+    const expectedApplesPerBasket = 12 / numVisibleBaskets
+    console.log('Expected apples per basket:', expectedApplesPerBasket)
+    
+    // Check if all visible baskets have exactly the expected number of apples
+    const isEven = visibleBaskets.every((isVisible, index) => 
+      !isVisible || basketCounts[index] === expectedApplesPerBasket
+    )
+    console.log('Basket counts:', basketCounts)
+    console.log('Is distribution even?', isEven)
+
+    // Check total apples
+    const totalApples = basketCounts.reduce((sum, count) => sum + count, 0)
+    console.log('Total apples:', totalApples)
+    
+    return isEven && totalApples === 12
+  }
 
   // Reset inactivity timer
   const resetInactivityTimer = () => {
@@ -198,6 +233,7 @@ function App() {
     )
   }
 
+  // Update handleMouseUp to check for even distribution immediately
   const handleMouseUp = () => {
     setApples(prevApples => {
       const draggedApple = prevApples.find(a => a.isDragging)
@@ -213,9 +249,9 @@ function App() {
         const basketRect = basket.getBoundingClientRect()
         const appleRect = {
           left: draggedApple.x + containerRef.current.getBoundingClientRect().left,
-          right: draggedApple.x + containerRef.current.getBoundingClientRect().left + 64, // Apple width
+          right: draggedApple.x + containerRef.current.getBoundingClientRect().left + 64,
           top: draggedApple.y + containerRef.current.getBoundingClientRect().top,
-          bottom: draggedApple.y + containerRef.current.getBoundingClientRect().top + 64 // Apple height
+          bottom: draggedApple.y + containerRef.current.getBoundingClientRect().top + 64
         }
 
         if (
@@ -232,11 +268,8 @@ function App() {
       if (droppedInBasket && visibleBaskets[basketIndex]) {
         const maxApples = getMaxApplesPerBasket()
         
-        // If the basket already has max apples, return the apple to its original position
         if (basketCounts[basketIndex] >= maxApples) {
-          console.log('Basket is full, returning apple to original position')
-          const randomIndex = Math.floor(Math.random() * warningMessages.length)
-          setFlexiMessage(warningMessages[randomIndex])
+          setFlexiMessage(getWarningMessage(maxApples))
           
           if (messageTimeoutRef.current) {
             clearTimeout(messageTimeoutRef.current)
@@ -259,19 +292,42 @@ function App() {
           )
         }
 
-        // If we get here, basket has room
+        // Calculate new basket counts
         const newBasketCounts = [...basketCounts]
         if (draggedApple.basketIndex !== null) {
           newBasketCounts[draggedApple.basketIndex]--
         }
         newBasketCounts[basketIndex]++
+
+        // Update the state with new basket counts
         setBasketCounts(newBasketCounts)
 
-        return prevApples.map(a =>
+        // Create updated apples array
+        const updatedApples = prevApples.map(a =>
           a.id === draggedApple.id
             ? { ...a, isDragging: false, basketIndex }
             : a
         )
+
+        // Check if the distribution is even using the new counts
+        console.log('Checking distribution after drop:')
+        console.log('Level:', level)
+        console.log('Visible baskets:', visibleBaskets)
+        console.log('New basket counts:', newBasketCounts)
+        
+        const isEvenlyDistributed = newBasketCounts.every((count, i) => 
+          !visibleBaskets[i] || count === (12 / visibleBaskets.filter(Boolean).length)
+        ) && newBasketCounts.reduce((sum, count) => sum + count, 0) === 12
+
+        console.log('Is evenly distributed?', isEvenlyDistributed)
+
+        if (isEvenlyDistributed) {
+          console.log('Success! Showing congratulatory message')
+          const randomIndex = Math.floor(Math.random() * congratsMessages.length)
+          setFlexiMessage(congratsMessages[randomIndex])
+        }
+
+        return updatedApples
       }
 
       // If not dropped in a basket, return to original position
