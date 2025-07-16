@@ -19,6 +19,7 @@ function App() {
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
+  const [magneticAppleId, setMagneticAppleId] = useState(null)
   const [flexiMessage, setFlexiMessage] = useState("Welcome to Division by Zero! Let's learn about dividing apples into baskets. Ready to start? 🍎")
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [customAnswer, setCustomAnswer] = useState("")
@@ -293,20 +294,84 @@ function App() {
 
   const handleMouseMove = (e) => {
     setApples(prevApples =>
-      prevApples.map(apple =>
-        apple.isDragging
-          ? {
-              ...apple,
-              x: e.clientX - apple.offsetX - containerRef.current.getBoundingClientRect().left,
-              y: e.clientY - apple.offsetY - containerRef.current.getBoundingClientRect().top
-            }
-          : apple
-      )
+      prevApples.map(apple => {
+        if (!apple.isDragging) return apple
+
+        let newX = e.clientX - apple.offsetX - containerRef.current.getBoundingClientRect().left
+        let newY = e.clientY - apple.offsetY - containerRef.current.getBoundingClientRect().top
+
+        // Check for magnetic attraction to baskets
+        const basketElements = document.querySelectorAll('.basket')
+        let closestBasketIndex = -1
+        let closestDistance = Infinity
+        const MAGNETIC_RADIUS = 80 // Distance in pixels for magnetic effect
+
+        basketElements.forEach((basket, index) => {
+          if (!visibleBaskets[index]) return
+          
+          const basketRect = basket.getBoundingClientRect()
+          const containerRect = containerRef.current.getBoundingClientRect()
+          
+          // Calculate basket center
+          const basketCenterX = basketRect.left - containerRect.left + basketRect.width / 2
+          const basketCenterY = basketRect.top - containerRect.top + basketRect.height / 2
+          
+          // Calculate apple center
+          const appleCenterX = newX + 32 // 32 is half of apple width (64px)
+          const appleCenterY = newY + 32 // 32 is half of apple height (64px)
+          
+          // Calculate distance
+          const distance = Math.sqrt(
+            Math.pow(appleCenterX - basketCenterX, 2) + 
+            Math.pow(appleCenterY - basketCenterY, 2)
+          )
+          
+          if (distance < closestDistance && distance < MAGNETIC_RADIUS) {
+            closestDistance = distance
+            closestBasketIndex = index
+          }
+        })
+
+        // Apply magnetic effect if close to a basket
+        if (closestBasketIndex !== -1) {
+          const basketElement = basketElements[closestBasketIndex]
+          const basketRect = basketElement.getBoundingClientRect()
+          const containerRect = containerRef.current.getBoundingClientRect()
+          
+          // Calculate basket center
+          const basketCenterX = basketRect.left - containerRect.left + basketRect.width / 2
+          const basketCenterY = basketRect.top - containerRect.top + basketRect.height / 2
+          
+          // Calculate magnetic force (stronger as you get closer)
+          const magneticForce = Math.max(0, 1 - (closestDistance / MAGNETIC_RADIUS))
+          const magneticStrength = 0.3 * magneticForce
+          
+          // Apply magnetic pull
+          const appleCenterX = newX + 32
+          const appleCenterY = newY + 32
+          
+          newX += (basketCenterX - appleCenterX) * magneticStrength
+          newY += (basketCenterY - appleCenterY) * magneticStrength
+          
+          // Set magnetic state for visual feedback
+          setMagneticAppleId(apple.id)
+        } else {
+          // Clear magnetic state if not near any basket
+          setMagneticAppleId(null)
+        }
+
+        return {
+          ...apple,
+          x: newX,
+          y: newY
+        }
+      })
     )
   }
 
   // Update handleMouseUp to check for even distribution immediately
   const handleMouseUp = () => {
+    setMagneticAppleId(null) // Clear magnetic state
     setApples(prevApples => {
       const draggedApple = prevApples.find(a => a.isDragging)
       if (!draggedApple) return prevApples
@@ -374,10 +439,48 @@ function App() {
         // Update the state with new basket counts
         setBasketCounts(newBasketCounts)
 
-        // Create updated apples array
+        // Calculate basket center position for magnetic snap
+        const basketElement = basketElements[basketIndex]
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const basketRect = basketElement.getBoundingClientRect()
+        
+        // Position apple in the center of the basket's main body area
+        const centerX = basketRect.left - containerRect.left + basketRect.width / 2 - 32 // Center horizontally
+        // Position apple within the basket's main body, not below it
+        const centerY = basketRect.top - containerRect.top + basketRect.height * 0 - 32 // Position at the very top of basket body
+        
+        // Create systematic positioning based on number of apples in basket
+        const applesInBasket = newBasketCounts[basketIndex]
+        let jitterX, jitterY
+        
+        if (applesInBasket === 1) {
+          // First apple: center
+          jitterX = 0
+          jitterY = 0
+        } else if (applesInBasket === 2) {
+          // Second apple: left
+          jitterX = -20
+          jitterY = 0
+        } else if (applesInBasket === 3) {
+          // Third apple: right
+          jitterX = 20
+          jitterY = 0
+        } else {
+          // Additional apples: center
+          jitterX = 0
+          jitterY = 0
+        }
+
+        // Create updated apples array with magnetic snap
         const updatedApples = prevApples.map(a =>
           a.id === draggedApple.id
-            ? { ...a, isDragging: false, basketIndex }
+            ? { 
+                ...a, 
+                isDragging: false, 
+                basketIndex,
+                x: centerX + jitterX,
+                y: centerY + jitterY
+              }
             : a
         )
 
@@ -602,7 +705,7 @@ function App() {
         {level !== 5 && apples.map((apple) => (
           <div 
             key={apple.id}
-            className={`apple ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
+            className={`apple ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''} ${apple.id === magneticAppleId ? 'magnetic' : ''}`}
             style={{
               '--x': `${apple.x}px`,
               '--y': `${apple.y}px`,

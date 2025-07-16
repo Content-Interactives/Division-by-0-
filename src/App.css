@@ -38,7 +38,7 @@ body {
   width: 64px;
   height: 64px;
   will-change: transform;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.3s ease-out;
   --x: 0px;
   --y: 0px;
 }
@@ -51,6 +51,12 @@ body {
   cursor: grabbing;
   opacity: 0.8;
   z-index: 1000;
+  transition: transform 0.1s ease-out;
+}
+
+.apple.magnetic {
+  filter: brightness(1.2) drop-shadow(0 0 8px rgba(255, 107, 0, 0.6));
+  transform: scale(1.05);
 }
 
 .apple.hint-move {
