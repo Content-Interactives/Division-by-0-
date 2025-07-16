@@ -292,6 +292,12 @@ body {
   color: #FF6B00;
 }
 
+/* Smaller buttons for the follow-up message */
+.flexi-response-message.follow-up + .reaction-buttons .reaction-button {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}
+
 .reaction-button:hover {
   background-color: #FFF3E0;
   transform: scale(1.02);
@@ -517,7 +523,7 @@ body {
   background-color: white;
   border: 2px solid #FF6B00;
   border-radius: 12px;
-  padding: 4px 12px;  /* Increased horizontal padding */
+  padding: 4px 12px 4px 8px;  /* Added left padding of 8px to move text left */
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-family: "proxima-nova", sans-serif;
@@ -528,7 +534,7 @@ body {
   width: 32%;  /* Slightly increased width */
   margin-left: auto;
   margin-right: auto;
-  text-align: center;  /* Ensure text is centered */
+  text-align: left;  /* Changed from center to left */
   min-width: 70px;  /* Ensure minimum width to fit text */
 }
 
