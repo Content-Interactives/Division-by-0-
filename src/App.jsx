@@ -175,6 +175,9 @@ function App() {
         // Highlight the first apple in the second row (index 6)
         setHighlightedAppleId(6)
         
+        // Show a helpful message from Flexi when highlighting
+        setFlexiMessage("Try dragging this apple to one of the baskets! 🍎")
+        
         // Start hint animation after highlighting
         hintTimeoutRef.current = setTimeout(() => {
           // Don't show hint if there's been any interaction
@@ -193,6 +196,9 @@ function App() {
               y: basketRect.top - containerRect.top - 20 // Move it higher up above the basket
             })
             setIsShowingHint(true)
+            
+            // Update message when hint animation starts
+            setFlexiMessage("Watch this apple move to show you where to drop it! ✨")
           }
         }, 500) // Start hint animation 0.5 seconds after highlight
       }, 3000)
