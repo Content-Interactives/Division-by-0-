@@ -19,7 +19,7 @@ function App() {
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
-  const [flexiMessage, setFlexiMessage] = useState("Time to grab some apples! How should we split them? Try 4, 3, 2, or 1 basket...but be careful with 0!")
+  const [flexiMessage, setFlexiMessage] = useState("Welcome to Division by Zero! Let's learn about dividing apples into baskets. Ready to start? 🍎")
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [customAnswer, setCustomAnswer] = useState("")
   const [apples, setApples] = useState(() => {
