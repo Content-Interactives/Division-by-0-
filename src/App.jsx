@@ -444,10 +444,10 @@ function App() {
         const containerRect = containerRef.current.getBoundingClientRect()
         const basketRect = basketElement.getBoundingClientRect()
         
-        // Position apple in the center of the basket's main body area
-        const centerX = basketRect.left - containerRect.left + basketRect.width / 2 - 32 // Center horizontally
+        // Position apple to create optical illusion of being centered in basket
+        const centerX = basketRect.left - containerRect.left + basketRect.width * 0.2 - 32 // Position toward left side for visual centering
         // Position apple within the basket's main body, not below it
-        const centerY = basketRect.top - containerRect.top + basketRect.height * 0 - 32 // Position at the very top of basket body
+        const centerY = basketRect.top - containerRect.top + basketRect.height * 0.2 - 32 // Position slightly down from top for visual centering
         
         // Create systematic positioning based on number of apples in basket
         const applesInBasket = newBasketCounts[basketIndex]
