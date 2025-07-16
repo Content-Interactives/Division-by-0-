@@ -466,9 +466,22 @@ function App() {
           jitterX = 20
           jitterY = 0
         } else {
-          // Additional apples: center
-          jitterX = 0
-          jitterY = 0
+          // Additional apples: stack in a tower formation with width of 3
+          const stackPosition = applesInBasket - 3 // 4th apple = 1, 5th apple = 2, etc.
+          const stackRow = Math.floor((stackPosition - 1) / 3) // Which row in the tower
+          const stackCol = (stackPosition - 1) % 3 // Which column in the tower (0=left, 1=center, 2=right)
+          
+          // Calculate horizontal position based on column
+          if (stackCol === 0) {
+            jitterX = -20 // Left
+          } else if (stackCol === 1) {
+            jitterX = 0 // Center
+          } else {
+            jitterX = 20 // Right
+          }
+          
+          // Calculate vertical position based on row
+          jitterY = -15 * (stackRow + 1) // Each row is 15px higher
         }
 
         // Create updated apples array with magnetic snap
