@@ -886,7 +886,7 @@ function App() {
                 <>
                   <div className="flexi-response-message follow-up">
                     No baskets means we have nowhere to put the apples!<br/>
-                    And that means we can't divide them
+                    And that means we can't divide them!
                   </div>
                   <div className="reaction-buttons">
                     <button 

@@ -290,18 +290,18 @@ body {
   background-color: white;
   border: 2px solid #FF6B00;
   border-radius: 15px;
-  padding: 8px 15px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-family: "proxima-nova", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #FF6B00;
 }
 
 /* Smaller buttons for the follow-up message */
 .flexi-response-message.follow-up + .reaction-buttons .reaction-button {
-  padding: 6px 10px;
-  font-size: 0.8rem;
+  padding: 5px 8px;
+  font-size: 0.75rem;
 }
 
 .reaction-button:hover {
