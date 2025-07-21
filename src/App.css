@@ -63,6 +63,7 @@ body {
   animation: moveToBasket 2s infinite;
   filter: brightness(1.5) drop-shadow(0 0 10px yellow);
   z-index: 2;
+  transform: translate(var(--x), var(--y));
 }
 
 @keyframes moveToBasket {
@@ -84,6 +85,7 @@ body {
   animation: pulse 1s infinite;
   filter: brightness(1.5) drop-shadow(0 0 10px yellow);
   z-index: 2;
+  transform: translate(var(--x), var(--y));
 }
 
 @keyframes pulse {
@@ -202,7 +204,7 @@ body {
 
 .flexi-speech-bubble {
   position: absolute;
-  bottom: 80px;
+  bottom: 40px;
   left: 160px;
   background-color: white;
   padding: 15px;
@@ -274,6 +276,19 @@ body {
   margin-top: 0;  /* Reset margin to ensure consistent positioning */
 }
 
+.flexi-response-message.hide-seek-response {
+  margin-top: -10px;  /* Move up by 10 pixels */
+}
+
+.flexi-response-message.undefined-response {
+  margin-top: 0;  /* Reset margin */
+}
+
+.no-baskets .flexi-speech-bubble.undefined-message-position {
+  top: 30%;  /* Use top positioning for consistent top alignment */
+  bottom: auto;  /* Override the default bottom positioning */
+}
+
 /* Add consistent top margin to the initial message */
 .no-baskets .flexi-speech-bubble > :first-child {
   margin-top: 0;
@@ -290,18 +305,18 @@ body {
   background-color: white;
   border: 2px solid #FF6B00;
   border-radius: 15px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-family: "proxima-nova", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #FF6B00;
 }
 
 /* Smaller buttons for the follow-up message */
 .flexi-response-message.follow-up + .reaction-buttons .reaction-button {
-  padding: 5px 8px;
-  font-size: 0.75rem;
+  padding: 8px 16px;
+  font-size: 0.9rem;
 }
 
 .reaction-button:hover {
@@ -447,7 +462,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #00A651;
+  background: linear-gradient(135deg, #16a34a, #15803d);
   color: white;
   border: none;
   font-size: 20px;
@@ -462,7 +477,7 @@ body {
 
 .nav-button:hover {
   transform: scale(1.1);
-  background-color: #008c44;
+  background: linear-gradient(135deg, #15803d, #166534);
 }
 
 .nav-button:active {
@@ -470,9 +485,17 @@ body {
 }
 
 .nav-button:disabled {
-  background-color: #ccc;
+  background: #ccc !important;
   cursor: not-allowed;
   transform: none;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.nav-button.at-zero {
+  background: #9ca3af !important;
+  opacity: 0.3;
+  border: 2px dashed #6b7280;
 }
 
 .answer-options {
@@ -666,6 +689,40 @@ body {
   transform: translateY(0);
 }
 
+/* Different button styles for the two modes */
+.animated-option {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+}
+
+.animated-option:hover {
+  background: linear-gradient(135deg, #15803d, #166534) !important;
+}
+
+.interactive-option {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+}
+
+.interactive-option:hover {
+  background: linear-gradient(135deg, #15803d, #166534) !important;
+}
+
+/* Interactive apple styles */
+.apple.interactive {
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.apple.interactive:hover {
+  transform: translate(var(--x), var(--y)) scale(1.1);
+  opacity: 0.9;
+}
+
+.apple.dragging {
+  cursor: grabbing !important;
+  opacity: 0.8;
+  z-index: 1000;
+  transition: none;
+}
+
 .custom-answer-error {
   color: #d32f2f;
   font-size: 0.9em;
@@ -738,6 +795,46 @@ body {
 @keyframes sway {
   0%, 100% { transform: rotate(-5deg); }
   50% { transform: rotate(5deg); }
+}
+
+/* Restart button */
+.restart-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.restart-button:hover {
+  background-color: #2d3748;
+  transform: scale(1.1);
+}
+
+.restart-button:active {
+  transform: scale(0.95);
+}
+
+/* Message text */
+.message-text {
+  margin-bottom: 10px;
+}
+
+/* Apple animation styles */
+.apple.animating {
+  pointer-events: none;
 }
 
 /* Mobile responsive scaling */
