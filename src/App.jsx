@@ -60,7 +60,7 @@ function App() {
   const [followUpReaction, setFollowUpReaction] = useState(null)
   const [showFinalMessage, setShowFinalMessage] = useState(false)
   const [customAnswerError, setCustomAnswerError] = useState("")
-  const [isInteractiveMode, setIsInteractiveMode] = useState(false)
+
 
   // Animation function to drop apples into baskets
   const animateApplesIntoBaskets = () => {
@@ -162,7 +162,8 @@ function App() {
         }
         
         // Calculate which basket this apple should go to
-        const currentBasketIndex = Math.floor(appleIndex / applesPerBasket);
+        // Distribute apples evenly: first apple goes to basket 0, second to basket 1, etc.
+        const currentBasketIndex = appleIndex % numVisibleBaskets;
         
         // Find the actual basket index (accounting for invisible baskets)
         let actualBasketIndex = 0;
@@ -185,7 +186,9 @@ function App() {
         }
         
         // Calculate apple position within the basket
-        const applesInThisBasket = appleIndex % applesPerBasket;
+        // Since we're distributing in rounds, calculate which round this apple is in
+        const roundNumber = Math.floor(appleIndex / numVisibleBaskets);
+        const applesInThisBasket = roundNumber;
         
         let jitterX, jitterY;
         if (applesInThisBasket === 0) {
@@ -361,73 +364,11 @@ function App() {
     setIsAnimating(false);
   }, [level]);
 
-  // Reset inactivity timer for interactive mode
-  const resetInactivityTimer = () => {
-    if (inactivityTimeoutRef.current) {
-      clearTimeout(inactivityTimeoutRef.current)
-    }
-    if (hintTimeoutRef.current) {
-      clearTimeout(hintTimeoutRef.current)
-    }
-    
-    setIsShowingHint(false)
-    setHighlightedAppleId(null)
-    isTimerActiveRef.current = false;
-    
-    // Only set timer if we're in interactive mode on basket pages and no interaction has occurred
-    if (isInteractiveMode && level >= 1 && level <= 3) {
-      const now = Date.now();
-      
-      // Prevent multiple timers within 3 seconds to avoid double highlighting
-      if (isTimerActiveRef.current || now - lastTimerSetRef.current < 3000) {
-        return;
-      }
-      
-      lastTimerSetRef.current = now;
-      isTimerActiveRef.current = true;
-      
-      inactivityTimeoutRef.current = setTimeout(() => {
-        // Don't show highlight if there's been any interaction
-        if (basketCounts.some(count => count > 0)) {
-          isTimerActiveRef.current = false;
-          return;
-        }
-        
-        // Highlight the middle apple (index 3)
-        setHighlightedAppleId(3)
-        
-        // Start hint animation after highlighting
-        hintTimeoutRef.current = setTimeout(() => {
-          // Don't show hint if there's been any interaction
-          if (basketCounts.some(count => count > 0)) {
-            setHighlightedAppleId(null);
-            isTimerActiveRef.current = false;
-            return;
-          }
-          
-          const basketElement = document.querySelector('.basket')
-          if (basketElement) {
-            const basketRect = basketElement.getBoundingClientRect()
-            const containerRect = containerRef.current.getBoundingClientRect()
-            
-            setHintPosition({
-              x: basketRect.left - containerRect.left + (basketRect.width / 2) - 32,
-              y: basketRect.top - containerRect.top - 20
-            })
-            setIsShowingHint(true)
-            
-            // Update message when hint animation starts
-            setFlexiMessage("Watch this apple move to show you where to drop it! ✨")
-          }
-          // Keep timer active until user interacts
-        }, 500)
-      }, 3000) // Delay set to 3 seconds of inactivity
-    }
-  }
 
-  // Auto-start animation when entering levels with baskets (only in animation mode)
+
+  // Auto-start animation when entering levels with baskets
   useEffect(() => {
-    if (level >= 1 && level <= 3 && !isInteractiveMode && !isAnimating && basketCounts.every(count => count === 0)) {
+    if (level >= 1 && level <= 3 && !isAnimating && basketCounts.every(count => count === 0)) {
       // Start animation after a short delay to let user see the initial state
       animationTimerRef.current = setTimeout(() => {
         if (level >= 1 && level <= 3) { // Double-check we're still on the right level
@@ -442,9 +383,9 @@ function App() {
         }
       };
     }
-  }, [level, visibleBaskets, isInteractiveMode]);
+  }, [level, visibleBaskets]);
 
-  // Clear highlight and timers when level or mode changes
+  // Clear highlight and timers when level changes
   useEffect(() => {
     setHighlightedAppleId(null)
     setIsShowingHint(false)
@@ -469,7 +410,7 @@ function App() {
       }
       isTimerActiveRef.current = false
     }
-  }, [level, isInteractiveMode])
+  }, [level])
 
   // Clear highlight when apples are placed in baskets
   useEffect(() => {
@@ -488,39 +429,11 @@ function App() {
     }
   }, [basketCounts])
 
-  // Add event listeners for user activity in interactive mode
-  useEffect(() => {
-    if (!isInteractiveMode) return;
-    
-    const handleActivity = () => {
-      // Mark that the user has interacted
-      hasInteractedRef.current = true;
 
-      // Always restart the inactivity timer on any user activity (mouse, click, key)
-      resetInactivityTimer()
-    }
-
-    window.addEventListener('mousemove', handleActivity)
-    window.addEventListener('click', handleActivity)
-    window.addEventListener('keydown', handleActivity)
-
-    return () => {
-      window.removeEventListener('mousemove', handleActivity)
-      window.removeEventListener('click', handleActivity)
-      window.removeEventListener('keydown', handleActivity)
-    }
-  }, [isInteractiveMode, level, basketCounts])
 
   // Handle animated mode selection
   const handleAnimatedMode = () => {
-    setIsInteractiveMode(false);
-    handleForward(false); // Pass mode directly
-  };
-
-  // Handle interactive mode selection
-  const handleInteractiveMode = () => {
-    setIsInteractiveMode(true);
-    handleForward(true); // Pass mode directly
+    handleForward(); // Just go forward with default animated mode
   };
 
   // Handle restart button click
@@ -560,225 +473,26 @@ function App() {
       // Intro page - just show welcome message
       setFlexiMessage("Welcome to Division by Zero! Let's learn about dividing apples into baskets. Ready to start? 🍎");
     } else if (level >= 1 && level <= 3) {
-      // Basket levels - reset and restart animation (only in animation mode)
+      // Basket levels - reset and restart animation
       const basketMessages = {
-        3: isInteractiveMode ? "Three baskets are ready! Try dragging the apples to divide them equally!" : "Three baskets are ready! Watch as we divide 6 apples equally!",
-        2: isInteractiveMode ? "Two baskets are waiting! Drag the apples to split them evenly!" : "Two baskets are waiting! Let's see how 6 apples split between them!",
-        1: isInteractiveMode ? "One basket is here! Drag all the apples into it!" : "One basket is here! All 6 apples will go in this one!"
+        3: "Three baskets are ready! Watch as we divide 6 apples equally!",
+        2: "Two baskets are waiting! Let's see how 6 apples split between them!",
+        1: "One basket is here! All 6 apples will go in this one!"
       };
       setFlexiMessage(basketMessages[level] || "Let's try dividing these apples!");
       
-      // Only restart animation in animation mode
-      if (!isInteractiveMode) {
-        setTimeout(() => {
-          if (level >= 1 && level <= 3) {
-            animateApplesIntoBaskets();
-          }
-        }, 1800);
-      }
+      // Restart animation
+      setTimeout(() => {
+        if (level >= 1 && level <= 3) {
+          animateApplesIntoBaskets();
+        }
+      }, 1800);
     }
-  };  // Drag and drop handlers for interactive mode
-  const handleMouseDown = (e, id) => {
-    if (!isInteractiveMode) return;
-    
-    const apple = e.target
-    const rect = apple.getBoundingClientRect()
-    const offsetX = e.clientX - rect.left
-    const offsetY = e.clientY - rect.top
 
-    hasInteractedRef.current = true; // first drag counts as interaction
-    setHighlightedAppleId(null)
-    setIsShowingHint(false)
-    isTimerActiveRef.current = false; // Clear timer state when user interacts
-    resetInactivityTimer()
-
-    // Show motivational message when picking up an apple
-    const motivationalMessages = [
-      "Great! Now drag it to a basket! 🍎",
-      "Perfect! Drop it in one of the baskets! ✨",
-      "Nice grab! Which basket will you choose? 🌟",
-      "Awesome! Let's put this apple somewhere! 🎉"
-    ]
-    const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]
-    setFlexiMessage(randomMessage)
-
-    setApples(prevApples =>
-      prevApples.map(a =>
-        a.id === id
-          ? { ...a, isDragging: true, offsetX, offsetY }
-          : a
-      )
-    )
-  }
-
-  const handleMouseMove = (e) => {
-    if (!isInteractiveMode) return;
-    
-    setApples(prevApples =>
-      prevApples.map(apple => {
-        if (!apple.isDragging) return apple
-
-        let newX = e.clientX - apple.offsetX - containerRef.current.getBoundingClientRect().left
-        let newY = e.clientY - apple.offsetY - containerRef.current.getBoundingClientRect().top
-
-        return {
-          ...apple,
-          x: newX,
-          y: newY
-        }
-      })
-    )
-  }
-
-  const handleMouseUp = () => {
-    if (!isInteractiveMode) return;
-    
-    setApples(prevApples => {
-      const draggedApple = prevApples.find(a => a.isDragging)
-      if (!draggedApple) return prevApples
-
-      const basketElements = document.querySelectorAll('.basket')
-      let droppedInBasket = false
-      let basketIndex = -1
-
-      basketElements.forEach((basket, index) => {
-        if (!visibleBaskets[index]) return
-        
-        const basketRect = basket.getBoundingClientRect()
-        const appleRect = {
-          left: draggedApple.x + containerRef.current.getBoundingClientRect().left,
-          right: draggedApple.x + containerRef.current.getBoundingClientRect().left + 64,
-          top: draggedApple.y + containerRef.current.getBoundingClientRect().top,
-          bottom: draggedApple.y + containerRef.current.getBoundingClientRect().top + 64
-        }
-
-        if (
-          appleRect.left < basketRect.right &&
-          appleRect.right > basketRect.left &&
-          appleRect.bottom > basketRect.top &&
-          appleRect.top < basketRect.bottom
-        ) {
-          droppedInBasket = true
-          basketIndex = index
-        }
-      })
-
-      if (droppedInBasket && visibleBaskets[basketIndex]) {
-        const maxApples = getMaxApplesPerBasket()
-        
-        if (basketCounts[basketIndex] >= maxApples) {
-          setFlexiMessage(getWarningMessage(maxApples))
-          
-          return prevApples.map(a =>
-            a.id === draggedApple.id
-              ? {
-                  ...a,
-                  isDragging: false,
-                  x: a.originalX,
-                  y: a.originalY,
-                  basketIndex: null
-                }
-              : a
-          )
-        }
-
-        // Update basket counts first
-        const newBasketCounts = [...basketCounts];
-        
-        // Handle moving from another basket
-        if (draggedApple.basketIndex !== null && draggedApple.basketIndex !== basketIndex) {
-          newBasketCounts[draggedApple.basketIndex]--;
-        }
-        
-        // Handle adding to this basket (only if not already in this basket)
-        if (draggedApple.basketIndex !== basketIndex) {
-          newBasketCounts[basketIndex]++;
-        }
-        
-        // Apply the new counts
-        setBasketCounts(newBasketCounts);
-        
-        // Calculate visual position based on the NEW count
-        const applesInThisBasket = newBasketCounts[basketIndex];
-
-        // Calculate basket center position
-        const basketElement = basketElements[basketIndex]
-        const containerRect = containerRef.current.getBoundingClientRect()
-        const basketRect = basketElement.getBoundingClientRect()
-        
-        const centerX = basketRect.left - containerRect.left + basketRect.width * 0.2 - 32
-        const centerY = basketRect.top - containerRect.top + basketRect.height * 0.2 - 32
-        
-        // Position apple in basket based on how many apples are now in the basket
-        let jitterX, jitterY
-        
-        if (applesInThisBasket === 1) {
-          jitterX = 0; jitterY = 0
-        } else if (applesInThisBasket === 2) {
-          jitterX = -20; jitterY = 0
-        } else if (applesInThisBasket === 3) {
-          jitterX = 20; jitterY = 0
-        } else {
-          const stackPosition = applesInThisBasket - 3
-          const stackRow = Math.floor((stackPosition - 1) / 3)
-          const stackCol = (stackPosition - 1) % 3
-          jitterX = stackCol === 0 ? -20 : stackCol === 1 ? 0 : 20
-          jitterY = -15 * (stackRow + 1)
-        }
-
-        const updatedApples = prevApples.map(a =>
-          a.id === draggedApple.id
-            ? { 
-                ...a, 
-                isDragging: false, 
-                basketIndex,
-                x: centerX + jitterX,
-                y: centerY + jitterY
-              }
-            : a
-        )
-
-        // Check if distribution is even using the already calculated new counts
-        const numVisibleBaskets = visibleBaskets.filter(Boolean).length
-        const isEvenlyDistributed = newBasketCounts.every((count, i) => 
-          !visibleBaskets[i] || count === (6 / numVisibleBaskets)
-        ) && newBasketCounts.reduce((sum, count) => sum + count, 0) === 6
-
-        if (isEvenlyDistributed) {
-          const divisionMessages = {
-            3: "Perfect! 6 ÷ 3 = 2 apples in each basket! 🌟",
-            2: "Excellent! 6 ÷ 2 = 3 apples in each basket! ⭐",
-            1: "Great job! 6 ÷ 1 = 6 apples in the basket! 🎉"
-          };
-          setTimeout(() => {
-            setFlexiMessage(divisionMessages[level] || congratsMessages[0])
-          }, 500)
-        }
-
-        return updatedApples
-      }
-
-      // Return to original position if not dropped in basket
-      return prevApples.map(a =>
-        a.id === draggedApple.id
-          ? {
-              ...a,
-              isDragging: false,
-              x: a.originalX,
-              y: a.originalY,
-              basketIndex: null
-            }
-          : a
-      )
-    })
-  }
 
   // Handle forward button click
-  const handleForward = (modeOverride = null) => {
+  const handleForward = () => {
     if (level <= 0) return
-    
-    // Use passed mode or fall back to current state
-    const currentMode = modeOverride !== null ? modeOverride : isInteractiveMode;
     
     // Clear any ongoing animations
     if (animationCleanupRef.current) {
@@ -825,17 +539,15 @@ function App() {
     
     // Predefined fun messages for each basket count
     const basketMessages = {
-      3: currentMode ? "Three baskets are ready! Try dragging the apples to divide them equally!" : "Three baskets are ready! Watch as we divide 6 apples equally!",
-      2: currentMode ? "Two baskets are waiting! Drag the apples to split them evenly!" : "Two baskets are waiting! Let's see how 6 apples split between them!",
-      1: currentMode ? "One basket is here! Drag all the apples into it!" : "One basket is here! All 6 apples will go in this one!",
+      3: "Three baskets are ready! Watch as we divide 6 apples equally!",
+      2: "Two baskets are waiting! Let's see how 6 apples split between them!",
+      1: "One basket is here! All 6 apples will go in this one!",
       0: "Oh no! Where did all the baskets go?"
     }
 
     // Set message based on the resulting number of baskets (newLevel)
     if (newLevel === 0) {
       setFlexiMessage(basketMessages[0])
-    } else if (newLevel === 1) {
-      setFlexiMessage("Now try putting all the apples in one basket!")
     } else {
       setFlexiMessage(basketMessages[newLevel] || `Now try dividing the apples between ${newLevel} baskets!`)
     }
@@ -894,9 +606,9 @@ function App() {
     
     // Predefined fun messages for each basket count
     const basketMessages = {
-      3: isInteractiveMode ? "Three baskets are ready! Try dragging the apples to divide them equally!" : "Three baskets are ready! Watch as we divide 6 apples equally!",
-      2: isInteractiveMode ? "Two baskets are waiting! Drag the apples to split them evenly!" : "Two baskets are waiting! Let's see how 6 apples split between them!",
-      1: isInteractiveMode ? "One basket is here! Drag all the apples into it!" : "One basket is here! All 6 apples will go in this one!"
+      3: "Three baskets are ready! Watch as we divide 6 apples equally!",
+      2: "Two baskets are waiting! Let's see how 6 apples split between them!",
+      1: "One basket is here! All 6 apples will go in this one!"
     }
 
     // Set appropriate messages for each level transition
@@ -968,11 +680,7 @@ function App() {
     <div 
       ref={containerRef} 
       className={`container ${level === 0 ? 'no-baskets' : ''} ${level === 5 ? 'blank-page' : ''}`}
-      onMouseMove={isInteractiveMode ? handleMouseMove : undefined}
-      onMouseUp={isInteractiveMode ? handleMouseUp : undefined}
-      onMouseLeave={isInteractiveMode ? handleMouseUp : undefined}
-      onPointerMove={isInteractiveMode ? handleMouseMove : undefined}
-      onPointerUp={isInteractiveMode ? handleMouseUp : undefined}
+
     >
       {level !== 5 && (
         <button 
@@ -988,7 +696,7 @@ function App() {
         {level !== 5 && apples.map((apple) => (
           <div 
             key={apple.id}
-            className={`apple ${isAnimating ? 'animating' : ''} ${apple.isDragging ? 'dragging' : ''} ${isInteractiveMode ? 'interactive' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
+            className={`apple ${isAnimating ? 'animating' : ''} ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
             style={{
               '--x': `${apple.x}px`,
               '--y': `${apple.y}px`,
@@ -997,11 +705,10 @@ function App() {
               transform: (apple.id === highlightedAppleId) ? undefined : `translate(${apple.x}px, ${apple.y}px)`,
               position: 'absolute',
               transition: isAnimating ? 'transform 0.5s ease-in-out' : 'none',
-              cursor: isInteractiveMode && !isAnimating ? 'grab' : 'default',
+              cursor: 'default',
               touchAction: 'none'
             }}
-            onMouseDown={isInteractiveMode ? (e) => handleMouseDown(e, apple.id) : undefined}
-            onPointerDown={isInteractiveMode ? (e) => handleMouseDown(e, apple.id) : undefined}
+            
           >
             {apple.content}
           </div>
@@ -1180,12 +887,6 @@ function App() {
                   onClick={handleAnimatedMode}
                 >
                   Show me how! ✨
-                </button>
-                <button 
-                  className="start-option interactive-option"
-                  onClick={handleInteractiveMode}
-                >
-                  Let me try! 🍎
                 </button>
               </div>
             </>
