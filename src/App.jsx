@@ -16,6 +16,8 @@ function App() {
   const messageTimeoutRef = useRef(null)
   const inactivityTimeoutRef = useRef(null)
   const hintTimeoutRef = useRef(null)
+  const lastTimerSetRef = useRef(0)
+  const isTimerActiveRef = useRef(false)
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
@@ -369,12 +371,24 @@ function App() {
     
     setIsShowingHint(false)
     setHighlightedAppleId(null)
+    isTimerActiveRef.current = false;
     
     // Only set timer if we're in interactive mode on basket pages and no interaction has occurred
     if (isInteractiveMode && level >= 1 && level <= 3) {
+      const now = Date.now();
+      
+      // Prevent multiple timers within 2 seconds to avoid double highlighting
+      if (isTimerActiveRef.current || now - lastTimerSetRef.current < 2000) {
+        return;
+      }
+      
+      lastTimerSetRef.current = now;
+      isTimerActiveRef.current = true;
+      
       inactivityTimeoutRef.current = setTimeout(() => {
         // Don't show highlight if there's been any interaction
         if (basketCounts.some(count => count > 0)) {
+          isTimerActiveRef.current = false;
           return;
         }
         
@@ -386,6 +400,7 @@ function App() {
           // Don't show hint if there's been any interaction
           if (basketCounts.some(count => count > 0)) {
             setHighlightedAppleId(null);
+            isTimerActiveRef.current = false;
             return;
           }
           
@@ -403,8 +418,9 @@ function App() {
             // Update message when hint animation starts
             setFlexiMessage("Watch this apple move to show you where to drop it! ✨")
           }
+          // Keep timer active until user interacts
         }, 500)
-      }, 500)
+      }, 2000) // Increased delay to 2 seconds
     }
   }
 
@@ -431,6 +447,8 @@ function App() {
   useEffect(() => {
     setHighlightedAppleId(null)
     setIsShowingHint(false)
+    lastTimerSetRef.current = 0; // Reset timer timestamp
+    isTimerActiveRef.current = false; // Reset timer state
     if (isInteractiveMode) {
       resetInactivityTimer()
     }
@@ -441,6 +459,7 @@ function App() {
       if (hintTimeoutRef.current) {
         clearTimeout(hintTimeoutRef.current)
       }
+      isTimerActiveRef.current = false;
     }
   }, [level, isInteractiveMode])
 
@@ -453,6 +472,7 @@ function App() {
       if (basketCounts.some(count => count > 0)) {
         setHighlightedAppleId(null)
         setIsShowingHint(false)
+        isTimerActiveRef.current = false;
         if (inactivityTimeoutRef.current) {
           clearTimeout(inactivityTimeoutRef.current)
         }
@@ -461,7 +481,15 @@ function App() {
         }
         return;
       }
-      resetInactivityTimer()
+      
+      // Only reset timer if there's currently a highlight or hint showing
+      // This prevents continuous resets during normal mouse movement
+      if (highlightedAppleId !== null || isShowingHint) {
+        resetInactivityTimer()
+      } else if (!isTimerActiveRef.current) {
+        // Start timer if not already active and no current highlights
+        resetInactivityTimer()
+      }
     }
 
     window.addEventListener('mousemove', handleActivity)
@@ -478,13 +506,13 @@ function App() {
   // Handle animated mode selection
   const handleAnimatedMode = () => {
     setIsInteractiveMode(false);
-    handleForward();
+    handleForward(false); // Pass mode directly
   };
 
   // Handle interactive mode selection
   const handleInteractiveMode = () => {
     setIsInteractiveMode(true);
-    handleForward();
+    handleForward(true); // Pass mode directly
   };
 
   // Handle restart button click
@@ -552,6 +580,7 @@ function App() {
 
     setHighlightedAppleId(null)
     setIsShowingHint(false)
+    isTimerActiveRef.current = false; // Clear timer state when user interacts
     resetInactivityTimer()
 
     // Show motivational message when picking up an apple
@@ -736,8 +765,11 @@ function App() {
   }
 
   // Handle forward button click
-  const handleForward = () => {
+  const handleForward = (modeOverride = null) => {
     if (level <= 0) return
+    
+    // Use passed mode or fall back to current state
+    const currentMode = modeOverride !== null ? modeOverride : isInteractiveMode;
     
     // Clear any ongoing animations
     if (animationCleanupRef.current) {
@@ -784,9 +816,9 @@ function App() {
     
     // Predefined fun messages for each basket count
     const basketMessages = {
-      3: isInteractiveMode ? "Three baskets are ready! Try dragging the apples to divide them equally!" : "Three baskets are ready! Watch as we divide 6 apples equally!",
-      2: isInteractiveMode ? "Two baskets are waiting! Drag the apples to split them evenly!" : "Two baskets are waiting! Let's see how 6 apples split between them!",
-      1: isInteractiveMode ? "One basket is here! Drag all the apples into it!" : "One basket is here! All 6 apples will go in this one!",
+      3: currentMode ? "Three baskets are ready! Try dragging the apples to divide them equally!" : "Three baskets are ready! Watch as we divide 6 apples equally!",
+      2: currentMode ? "Two baskets are waiting! Drag the apples to split them evenly!" : "Two baskets are waiting! Let's see how 6 apples split between them!",
+      1: currentMode ? "One basket is here! Drag all the apples into it!" : "One basket is here! All 6 apples will go in this one!",
       0: "Oh no! Where did all the baskets go?"
     }
 
