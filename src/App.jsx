@@ -471,6 +471,23 @@ function App() {
     }
   }, [level, isInteractiveMode])
 
+  // Clear highlight when apples are placed in baskets
+  useEffect(() => {
+    if (basketCounts.some(count => count > 0)) {
+      setHighlightedAppleId(null)
+      setIsShowingHint(false)
+      isTimerActiveRef.current = false;
+      
+      // Clear any pending timers
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current)
+      }
+    }
+  }, [basketCounts])
+
   // Add event listeners for user activity in interactive mode
   useEffect(() => {
     if (!isInteractiveMode) return;
