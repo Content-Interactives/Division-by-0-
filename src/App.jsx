@@ -18,6 +18,7 @@ function App() {
   const hintTimeoutRef = useRef(null)
   const lastTimerSetRef = useRef(0)
   const isTimerActiveRef = useRef(false)
+  const hasInteractedRef = useRef(false)
   const [highlightedAppleId, setHighlightedAppleId] = useState(null)
   const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 })
   const [isShowingHint, setIsShowingHint] = useState(false)
@@ -377,8 +378,8 @@ function App() {
     if (isInteractiveMode && level >= 1 && level <= 3) {
       const now = Date.now();
       
-      // Prevent multiple timers within 2 seconds to avoid double highlighting
-      if (isTimerActiveRef.current || now - lastTimerSetRef.current < 2000) {
+      // Prevent multiple timers within 3 seconds to avoid double highlighting
+      if (isTimerActiveRef.current || now - lastTimerSetRef.current < 3000) {
         return;
       }
       
@@ -420,7 +421,7 @@ function App() {
           }
           // Keep timer active until user interacts
         }, 500)
-      }, 2000) // Increased delay to 2 seconds
+      }, 3000) // Delay set to 3 seconds of inactivity
     }
   }
 
@@ -443,15 +444,22 @@ function App() {
     }
   }, [level, visibleBaskets, isInteractiveMode]);
 
-  // Clear highlight and timer when level changes or mode changes
+  // Clear highlight and timers when level or mode changes
   useEffect(() => {
     setHighlightedAppleId(null)
     setIsShowingHint(false)
-    lastTimerSetRef.current = 0; // Reset timer timestamp
-    isTimerActiveRef.current = false; // Reset timer state
-    if (isInteractiveMode) {
-      resetInactivityTimer()
+    lastTimerSetRef.current = 0; // Reset timestamp
+    isTimerActiveRef.current = false;
+    hasInteractedRef.current = false; // No user interaction yet on new page
+
+    // Clear any pending timers
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current)
     }
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current)
+    }
+
     return () => {
       if (inactivityTimeoutRef.current) {
         clearTimeout(inactivityTimeoutRef.current)
@@ -459,7 +467,7 @@ function App() {
       if (hintTimeoutRef.current) {
         clearTimeout(hintTimeoutRef.current)
       }
-      isTimerActiveRef.current = false;
+      isTimerActiveRef.current = false
     }
   }, [level, isInteractiveMode])
 
@@ -468,28 +476,11 @@ function App() {
     if (!isInteractiveMode) return;
     
     const handleActivity = () => {
-      // If there are any apples in baskets, permanently disable the highlight
-      if (basketCounts.some(count => count > 0)) {
-        setHighlightedAppleId(null)
-        setIsShowingHint(false)
-        isTimerActiveRef.current = false;
-        if (inactivityTimeoutRef.current) {
-          clearTimeout(inactivityTimeoutRef.current)
-        }
-        if (hintTimeoutRef.current) {
-          clearTimeout(hintTimeoutRef.current)
-        }
-        return;
-      }
-      
-      // Only reset timer if there's currently a highlight or hint showing
-      // This prevents continuous resets during normal mouse movement
-      if (highlightedAppleId !== null || isShowingHint) {
-        resetInactivityTimer()
-      } else if (!isTimerActiveRef.current) {
-        // Start timer if not already active and no current highlights
-        resetInactivityTimer()
-      }
+      // Mark that the user has interacted
+      hasInteractedRef.current = true;
+
+      // Always restart the inactivity timer on any user activity (mouse, click, key)
+      resetInactivityTimer()
     }
 
     window.addEventListener('mousemove', handleActivity)
@@ -578,6 +569,7 @@ function App() {
     const offsetX = e.clientX - rect.left
     const offsetY = e.clientY - rect.top
 
+    hasInteractedRef.current = true; // first drag counts as interaction
     setHighlightedAppleId(null)
     setIsShowingHint(false)
     isTimerActiveRef.current = false; // Clear timer state when user interacts
