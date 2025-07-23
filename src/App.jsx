@@ -54,12 +54,13 @@ function App() {
       }
     })
   })
-  const [flexiResponse, setFlexiResponse] = useState("")
-  const [selectedReaction, setSelectedReaction] = useState(null)
-  const [showFollowUpMessage, setShowFollowUpMessage] = useState(false)
-  const [followUpReaction, setFollowUpReaction] = useState(null)
-  const [showFinalMessage, setShowFinalMessage] = useState(false)
-  const [customAnswerError, setCustomAnswerError] = useState("")
+    const [flexiResponse, setFlexiResponse] = useState("")
+  const [selectedReaction, setSelectedReaction] = useState(null)
+  const [showFollowUpMessage, setShowFollowUpMessage] = useState(false)
+  const [followUpReaction, setFollowUpReaction] = useState(null)
+  const [showFinalMessage, setShowFinalMessage] = useState(false)
+  const [customAnswerError, setCustomAnswerError] = useState("")
+  const [flexiMoved, setFlexiMoved] = useState(false)
 
 
   // Animation function to drop apples into baskets
@@ -249,28 +250,53 @@ function App() {
     };
   };
 
-  // Add this near the top with other state variables
-  const inappropriateWords = [
-    'fuck', 'shit', 'damn', 'ass', 'bitch', 'crap', 'piss', 'dick', 'cock', 'pussy', 'bastard',
-    'hell', 'whore', 'slut', 'prick', 'cunt', 'asshole', 'fag', 'retard', 'nigger', 'nigga'
-  ]
+    // Add this near the top with other state variables
+  const inappropriateWords = [
+    'fuck', 'shit', 'damn', 'ass', 'bitch', 'crap', 'piss', 'dick', 'cock', 'pussy', 'bastard',
+    'hell', 'whore', 'slut', 'prick', 'cunt', 'asshole', 'fag', 'retard', 'nigger', 'nigga',
+    'your mom', 'kill yourself', 'kys', 'nobody likes you', 'get a life', 'cry more', 'stay mad',
+    'you\'re adopted', 'go touch grass', 'daddy issues', 'sugar daddy', 'milf', 'thicc',
+    'smash or pass', 'sloot', 'sl00t', 'ride me', 'blow up my', 'send nudes', 'leak pics',
+    'doxx', 'swat', 'ratioed', 'you fell off', 'get rekt', 'go die', 'nuke your account',
+    'skittle', 'degen', 'npc', 'soyboy', 'cuck', 'simp', 'karen', 'cut myself', 'want to die',
+    'not worth living', 'no one would miss me'
+  ]
 
-  const containsInappropriateWord = (text) => {
-    const words = text.toLowerCase().split(/\s+/)
-    return words.some(word => 
-      inappropriateWords.some(badWord => 
-        word.includes(badWord) || 
-        // Check for common letter substitutions
-        word.replace(/[1!|]/g, 'i')
-           .replace(/[3]/g, 'e')
-           .replace(/[4@]/g, 'a')
-           .replace(/[5]/g, 's')
-           .replace(/[0]/g, 'o')
-           .replace(/[$]/g, 's')
-           .includes(badWord)
-      )
-    )
-  }
+    const containsInappropriateWord = (text) => {
+    const lowerText = text.toLowerCase()
+    
+    // Check for phrases first (multi-word inappropriate content)
+    const inappropriatePhrases = [
+      'your mom', 'kill yourself', 'nobody likes you', 'get a life', 'cry more', 'stay mad',
+      'you\'re adopted', 'go touch grass', 'daddy issues', 'sugar daddy', 'smash or pass',
+      'blow up my', 'send nudes', 'leak pics', 'you fell off', 'get rekt', 'go die',
+      'nuke your account', 'cut myself', 'want to die', 'not worth living', 'no one would miss me'
+    ]
+    
+    // Check for phrases
+    if (inappropriatePhrases.some(phrase => lowerText.includes(phrase))) {
+      return true
+    }
+    
+    // Check for individual words
+    const words = lowerText.split(/\s+/)
+    return words.some(word => 
+      inappropriateWords.some(badWord => 
+        word.includes(badWord) || 
+        // Check for common letter substitutions
+        word.replace(/[1!|]/g, 'i')
+           .replace(/[3]/g, 'e')
+           .replace(/[4@]/g, 'a')
+           .replace(/[5]/g, 's')
+           .replace(/[0]/g, 'o')
+           .replace(/[$]/g, 's')
+           .replace(/[*]/g, '')
+           .replace(/[#]/g, '')
+           .replace(/[@]/g, 'a')
+           .includes(badWord)
+      )
+    )
+  }
 
   // Get max apples per basket based on level
   const getMaxApplesPerBasket = () => {
@@ -308,19 +334,136 @@ function App() {
     "Well done! You solved the division problem perfectly! 🎈"
   ]
 
-  const getFlexiResponse = (answer, customText = "") => {
-    switch(answer) {
-      case 'circus':
-        return "Wow, joining the circus? I bet they're great at balancing acts! 🎪 Maybe they'll teach the apples some juggling tricks! 🤹‍♂️"
-      case 'hide-seek':
-        return "Ooh, sneaky baskets! Should we count to 10 and go find them? Ready or not, here we come! 👀"
-      case 'custom':
-        if (!customText.trim()) return ""
-        return `${customText}? That's such a creative idea! I never would have thought of that! 🌟`
-      default:
-        return ""
-    }
-  }
+    const getFlexiResponse = (answer, customText = "") => {
+    switch(answer) {
+      case 'circus':
+        return "Wow, joining the circus? I bet they're great at balancing acts! 🎪 Maybe they'll teach the apples some juggling tricks! 🤹‍♂️"
+      case 'hide-seek':
+        return "Ooh, sneaky baskets! Should we count to 10 and go find them? Ready or not, here we come! 👀"
+      case 'custom':
+        if (!customText.trim()) return ""
+        return generateCustomResponse(customText)
+      default:
+        return ""
+    }
+  }
+
+  const generateCustomResponse = (customText) => {
+    const text = customText.toLowerCase().trim()
+    
+    // Check for inappropriate or sad content first
+    if (text.includes('die') || text.includes('death') || text.includes('dead') || text.includes('kill') || 
+        text.includes('hurt') || text.includes('pain') || text.includes('sad') || text.includes('cry') ||
+        text.includes('hate') || text.includes('angry') || text.includes('scary') || text.includes('fear')) {
+      return `Oh no! Let's think of something happier for our friendly baskets! 🌈 Maybe they could go on a fun adventure instead?`
+    }
+    
+    // Check for different types of responses based on keywords
+    if (text.includes('eat') || text.includes('food') || text.includes('hungry') || text.includes('snack')) {
+      return `Eating ${customText}? Yummy! 🍎 I hope they share with their apple friends!`
+    }
+    
+    if (text.includes('play') || text.includes('game') || text.includes('fun') || text.includes('toy')) {
+      return `Playing ${customText}? That sounds like so much fun! 🎮 I bet the apples would love to join in!`
+    }
+    
+    if (text.includes('sleep') || text.includes('bed') || text.includes('rest') || text.includes('nap')) {
+      return `${customText}? Time for a cozy nap! 😴 Sweet dreams, little baskets!`
+    }
+    
+    if (text.includes('dance') || text.includes('music') || text.includes('sing') || text.includes('song')) {
+      return `${customText}? Let's have a dance party! 💃🕺 The apples can be our backup dancers!`
+    }
+    
+    if (text.includes('school') || text.includes('learn') || text.includes('study') || text.includes('read')) {
+      return `${customText}? Learning is awesome! 📚 Maybe they can teach us some math tricks!`
+    }
+    
+    if (text.includes('swim') || text.includes('water') || text.includes('pool') || text.includes('ocean')) {
+      return `${customText}? Splish splash! 💧 I hope they don't get too wet!`
+    }
+    
+    if (text.includes('fly') || text.includes('bird') || text.includes('airplane') || text.includes('sky')) {
+      return `${customText}? Up, up, and away! ✈️ The baskets are going on an adventure!`
+    }
+    
+    if (text.includes('run') || text.includes('race') || text.includes('fast') || text.includes('sport')) {
+      return `${customText}? On your marks, get set, go! 🏃‍♂️ The baskets are getting their exercise!`
+    }
+    
+    if (text.includes('cook') || text.includes('bake') || text.includes('kitchen') || text.includes('recipe')) {
+      return `${customText}? Yum! 👨‍🍳 I bet they'll make something delicious!`
+    }
+    
+    if (text.includes('draw') || text.includes('paint') || text.includes('art') || text.includes('color')) {
+      return `${customText}? How creative! 🎨 The baskets are becoming little artists!`
+    }
+    
+    if (text.includes('friend') || text.includes('family') || text.includes('visit') || text.includes('party')) {
+      return `${customText}? That's so sweet! 💕 Spending time with loved ones is the best!`
+    }
+    
+    if (text.includes('magic') || text.includes('wizard') || text.includes('spell') || text.includes('wand')) {
+      return `${customText}? Abracadabra! ✨ The baskets have magical powers now!`
+    }
+    
+    if (text.includes('space') || text.includes('rocket') || text.includes('planet') || text.includes('star')) {
+      return `${customText}? To infinity and beyond! 🚀 The baskets are space explorers!`
+    }
+    
+    if (text.includes('robot') || text.includes('machine') || text.includes('computer') || text.includes('tech')) {
+      return `${customText}? Beep boop! 🤖 The baskets are getting high-tech!`
+    }
+    
+    if (text.includes('animal') || text.includes('pet') || text.includes('dog') || text.includes('cat')) {
+      return `${customText}? Aww, how adorable! 🐾 The baskets are making furry friends!`
+    }
+    
+    if (text.includes('garden') || text.includes('plant') || text.includes('flower') || text.includes('tree')) {
+      return `${customText}? Growing green thumbs! 🌱 The baskets are nature lovers!`
+    }
+    
+    if (text.includes('book') || text.includes('story') || text.includes('tale') || text.includes('adventure')) {
+      return `${customText}? Once upon a time... 📖 The baskets are storytellers!`
+    }
+    
+    if (text.includes('car') || text.includes('drive') || text.includes('road') || text.includes('travel')) {
+      return `${customText}? Vroom vroom! 🚗 The baskets are going on a road trip!`
+    }
+    
+    if (text.includes('movie') || text.includes('film') || text.includes('watch') || text.includes('cinema')) {
+      return `${customText}? Lights, camera, action! 🎬 The baskets are movie stars!`
+    }
+    
+    if (text.includes('shop') || text.includes('buy') || text.includes('store') || text.includes('mall')) {
+      return `${customText}? Shopping spree! 🛍️ The baskets are getting some retail therapy!`
+    }
+    
+    if (text.includes('doctor') || text.includes('hospital') || text.includes('medicine') || text.includes('health')) {
+      return `${customText}? Taking care of health! 🏥 The baskets are being responsible!`
+    }
+    
+    if (text.includes('teacher') || text.includes('class') || text.includes('lesson') || text.includes('education')) {
+      return `${customText}? Knowledge is power! 👩‍🏫 The baskets are becoming wise!`
+    }
+    
+    // Default responses for general cases
+    const defaultResponses = [
+      `Wow, ${customText}? That's such a creative idea! 🌟`,
+      `${customText}? How imaginative! I love that! ✨`,
+      `That's brilliant! ${customText} sounds amazing! 🎉`,
+      `${customText}? What a fantastic suggestion! 🌈`,
+      `I never would have thought of ${customText}! So clever! 🧠`,
+      `${customText}? That's absolutely wonderful! 💫`,
+      `What a unique idea! ${customText} is perfect! 🎯`,
+      `${customText}? You have such a creative mind! 🌟`,
+      `That's so thoughtful! ${customText} is a great choice! 💝`,
+      `${customText}? I'm impressed by your imagination! 🚀`
+    ]
+    
+    // Return a random default response
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
+  }
 
   // Check if apples are evenly distributed
   const checkEvenDistribution = () => {
@@ -385,32 +528,44 @@ function App() {
     }
   }, [level, visibleBaskets]);
 
-  // Clear highlight and timers when level changes
-  useEffect(() => {
-    setHighlightedAppleId(null)
-    setIsShowingHint(false)
-    lastTimerSetRef.current = 0; // Reset timestamp
-    isTimerActiveRef.current = false;
-    hasInteractedRef.current = false; // No user interaction yet on new page
+    // Clear highlight and timers when level changes
+  useEffect(() => {
+    setHighlightedAppleId(null)
+    setIsShowingHint(false)
+    lastTimerSetRef.current = 0; // Reset timestamp
+    isTimerActiveRef.current = false;
+    hasInteractedRef.current = false; // No user interaction yet on new page
+    setFlexiMoved(false) // Reset Flexi position for zero basket page
 
-    // Clear any pending timers
-    if (inactivityTimeoutRef.current) {
-      clearTimeout(inactivityTimeoutRef.current)
-    }
-    if (hintTimeoutRef.current) {
-      clearTimeout(hintTimeoutRef.current)
-    }
+    // Clear any pending timers
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current)
+    }
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current)
+    }
 
-    return () => {
-      if (inactivityTimeoutRef.current) {
-        clearTimeout(inactivityTimeoutRef.current)
-      }
-      if (hintTimeoutRef.current) {
-        clearTimeout(hintTimeoutRef.current)
-      }
-      isTimerActiveRef.current = false
-    }
-  }, [level])
+    return () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current)
+      }
+      isTimerActiveRef.current = false
+    }
+  }, [level])
+
+  // Handle Flexi movement on zero basket page
+  useEffect(() => {
+    if (level === 0 && !flexiMoved) {
+      const timer = setTimeout(() => {
+        setFlexiMoved(true)
+      }, 5000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [level, flexiMoved])
 
   // Clear highlight when apples are placed in baskets
   useEffect(() => {
@@ -693,39 +848,38 @@ function App() {
       )}
       <h1 className="title">Division by Zero</h1>
       <div className="interactive-area">
-        {level !== 5 && apples.map((apple) => (
-          <div 
-            key={apple.id}
-            className={`apple ${isAnimating ? 'animating' : ''} ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
-            style={{
-              '--x': `${apple.x}px`,
-              '--y': `${apple.y}px`,
-              '--hint-x': `${hintPosition.x}px`,
-              '--hint-y': `${hintPosition.y}px`,
-              transform: (apple.id === highlightedAppleId) ? undefined : `translate(${apple.x}px, ${apple.y}px)`,
-              position: 'absolute',
-              transition: isAnimating ? 'transform 0.5s ease-in-out' : 'none',
-              cursor: 'default',
-              touchAction: 'none'
-            }}
-            
-          >
-            {apple.content}
-          </div>
-        ))}
-        <div className="baskets-container">
-          {level !== 5 && visibleBaskets.map((isVisible, index) => 
-            isVisible && (
-              <div key={index} className="basket">
-                <div className="basket-body">
-                  {basketCounts[index] > 0 && (
-                    <div className="basket-counter">{basketCounts[index]}</div>
-                  )}
-                </div>
-              </div>
-            )
-          )}
-        </div>
+                {level !== 5 && apples.map((apple) => (
+          <div 
+            key={apple.id}
+            className={`apple ${isAnimating ? 'animating' : ''} ${apple.isDragging ? 'dragging' : ''} ${apple.id === highlightedAppleId ? (isShowingHint ? 'hint-move' : 'highlight') : ''}`}
+            style={{
+              '--x': `${apple.x}px`,
+              '--y': `${apple.y}px`,
+              '--hint-x': `${hintPosition.x}px`,
+              '--hint-y': `${hintPosition.y}px`,
+              transform: (apple.id === highlightedAppleId) ? undefined : `translate(${apple.x}px, ${apple.y}px)`,
+              position: 'absolute',
+              transition: isAnimating ? 'transform 0.5s ease-in-out' : 'none',
+              cursor: 'default',
+              touchAction: 'none'
+            }}
+            
+          >
+            <div className="apple-number">{apple.id + 1}</div>
+            {apple.content}
+          </div>
+        ))}
+                <div className="baskets-container">
+          {level !== 5 && visibleBaskets.map((isVisible, index) => 
+            isVisible && (
+              <div key={index} className="basket">
+                <div className="basket-number">Basket {index + 1}</div>
+                <div className="basket-body">
+                </div>
+              </div>
+            )
+          )}
+        </div>
         <div className="apple-tree">
           <div className="tree-trunk"></div>
           <div className="tree-crown">
@@ -769,8 +923,8 @@ function App() {
             }
             return flexiImage;
           })()}
-          alt="Flexi character" 
-          className="flexi"
+                    alt="Flexi character" 
+          className={`flexi ${level === 0 ? (flexiMoved ? 'zero-basket-final' : 'zero-basket-start') : ''}`}
         />
         <div className={`flexi-speech-bubble ${level === 0 && (showFollowUpMessage || showFinalMessage) ? 'undefined-message-position' : ''}`}>
           {level === 0 && !flexiResponse ? (
@@ -827,23 +981,32 @@ function App() {
                   <div className={`flexi-response-message ${selectedAnswer === 'hide-seek' ? 'hide-seek-response' : ''}`}>
                     {flexiResponse}
                   </div>
-                  <div className="reaction-buttons">
-                    {selectedAnswer === 'custom' ? (
-                      <button 
-                        className={`reaction-button ${selectedReaction === 'thanks' ? 'selected' : ''}`}
-                        onClick={() => handleReactionSelect('thanks')}
-                      >
-                        Thanks! 😊
-                      </button>
-                    ) : (
-                      <button 
-                        className={`reaction-button ${selectedReaction === 'haha' ? 'selected' : ''}`}
-                        onClick={() => handleReactionSelect('haha')}
-                      >
-                        Haha definitely!
-                      </button>
-                    )}
-                  </div>
+                                    <div className="reaction-buttons">
+                    {selectedAnswer === 'custom' ? (
+                      flexiResponse.includes("Oh no! Let's think of something happier") ? (
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'okay' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('okay')}
+                        >
+                          Okay! 👍
+                        </button>
+                      ) : (
+                        <button 
+                          className={`reaction-button ${selectedReaction === 'thanks' ? 'selected' : ''}`}
+                          onClick={() => handleReactionSelect('thanks')}
+                        >
+                          Thanks! 😊
+                        </button>
+                      )
+                    ) : (
+                      <button 
+                        className={`reaction-button ${selectedReaction === 'haha' ? 'selected' : ''}`}
+                        onClick={() => handleReactionSelect('haha')}
+                      >
+                        Haha definitely!
+                      </button>
+                    )}
+                  </div>
                 </>
               ) : !showFinalMessage ? (
                 <>
@@ -886,7 +1049,7 @@ function App() {
                   className="start-option animated-option"
                   onClick={handleAnimatedMode}
                 >
-                  Show me how! ✨
+                                  Let's start! ✨
                 </button>
               </div>
             </>

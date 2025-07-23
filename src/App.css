@@ -41,6 +41,26 @@ body {
   transition: opacity 0.2s, transform 0.3s ease-out;
   --x: 0px;
   --y: 0px;
+  position: relative;
+}
+
+.apple-number {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #FF6B00;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.7rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .apple:hover {
@@ -114,8 +134,19 @@ body {
   transition: all 0.5s ease-in-out;
 }
 
+.flexi.zero-basket-start {
+  bottom: 20px;
+  left: 20px;
+}
+
+.flexi.zero-basket-final {
+  bottom: 45%;
+  left: 30%;
+  transform: translate(-50%, 50%);
+}
+
 /* Add styles for when no baskets are visible */
-.no-baskets .flexi {
+.no-baskets .flexi:not(.zero-basket-start) {
   bottom: 45%;
   left: 30%;  /* Changed from 35% to 30% to move Flexi more left */
   transform: translate(-50%, 50%);
@@ -376,9 +407,28 @@ body {
 
 .basket {
   width: 120px;
-  height: 120px;
+  height: 140px;
   position: relative;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.basket-number {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-family: "proxima-nova", sans-serif;
+  font-size: 0.8rem;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .basket-body {
@@ -440,7 +490,7 @@ body {
 
 .baskets-container {
   position: absolute;
-  bottom: 200px;
+  bottom: 180px;
   left: 0;
   right: 0;
   display: flex;
