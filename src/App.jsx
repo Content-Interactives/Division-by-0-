@@ -562,10 +562,7 @@ function App() {
     if (level === 0 && !flexiMoved) {
       const timer = setTimeout(() => {
         setFlexiMoved(true)
-        // Show speech bubble after Flexi moves (additional 2 seconds = 7 seconds total)
-        setTimeout(() => {
-          setShowSpeechBubble(true)
-        }, 2000)
+        setShowSpeechBubble(true)
       }, 5000)
       
       return () => clearTimeout(timer)
@@ -923,11 +920,11 @@ function App() {
               // Show original Flexi for final message
               return flexiImage;
             }
-            // Show stars Flexi when user is actively placing apples
-            const isDraggingApple = apples.some(apple => apple.isDragging);
-            if (isDraggingApple) {
-              return flexiStarsImage;
-            }
+                        // Show stars Flexi when user is actively placing apples or during animation
+            const isDraggingApple = apples.some(apple => apple.isDragging);
+            if (isDraggingApple || isAnimating) {
+              return flexiStarsImage;
+            }
             return flexiImage;
           })()}
                     alt="Flexi character" 
@@ -935,7 +932,7 @@ function App() {
         />
                 {level === 0 && showSpeechBubble && (
         <div className={`flexi-speech-bubble ${level === 0 && (showFollowUpMessage || showFinalMessage) ? 'undefined-message-position' : ''}`}>
-          {level === 0 && !flexiResponse ? (
+          {level === 0 && !flexiResponse ? (
             <>
               {flexiMessage}
               <div className="answer-options">
@@ -1047,26 +1044,32 @@ function App() {
                 (Click to try another answer)
               </div>
             </div>
-          ) : level === 5 ? (
-            <>
-              <div className="welcome-message">
-                {flexiMessage}
-              </div>
-              <div className="start-options">
-                <button 
-                  className="start-option animated-option"
-                  onClick={handleAnimatedMode}
-                >
-                                  Let's start! ✨
-                </button>
-              </div>
-            </>
-          ) : level >= 1 && level <= 3 ? (
-            <div className="message-text">{flexiMessage}</div>
                     ) : (
             flexiMessage
           )}
         </div>
+        )}
+        {level === 5 && (
+          <>
+            <div className="flexi-speech-bubble">
+              <div className="welcome-message">
+                {flexiMessage}
+              </div>
+              <div className="start-options">
+                <button 
+                  className="start-option animated-option"
+                  onClick={handleAnimatedMode}
+                >
+                  Let's start! ✨
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+        {level >= 1 && level <= 3 && (
+          <div className="flexi-speech-bubble">
+            {flexiMessage}
+          </div>
         )}
         {level !== 5 && (
           <div className="nav-buttons">
