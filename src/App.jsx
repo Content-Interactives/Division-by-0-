@@ -488,7 +488,7 @@ function App() {
         }
       }, 1800);
     }
-
+  };
 
   // Handle forward button click
   const handleForward = () => {
