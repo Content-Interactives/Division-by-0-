@@ -61,6 +61,7 @@ function App() {
   const [showFinalMessage, setShowFinalMessage] = useState(false)
   const [customAnswerError, setCustomAnswerError] = useState("")
   const [flexiMoved, setFlexiMoved] = useState(false)
+  const [showSpeechBubble, setShowSpeechBubble] = useState(false)
 
 
   // Animation function to drop apples into baskets
@@ -561,6 +562,10 @@ function App() {
     if (level === 0 && !flexiMoved) {
       const timer = setTimeout(() => {
         setFlexiMoved(true)
+        // Show speech bubble after Flexi moves (additional 2 seconds = 7 seconds total)
+        setTimeout(() => {
+          setShowSpeechBubble(true)
+        }, 2000)
       }, 5000)
       
       return () => clearTimeout(timer)
@@ -621,9 +626,11 @@ function App() {
       setFlexiResponse("");
       setSelectedReaction(null);
       setShowFollowUpMessage(false);
-      setFollowUpReaction(null);
-      setShowFinalMessage(false);
-      setFlexiMessage("Oh no! Where did all the baskets go?");
+            setFollowUpReaction(null);
+      setShowFinalMessage(false);
+      setFlexiMoved(false);
+      setShowSpeechBubble(false);
+      setFlexiMessage("Oh no! Where did all the baskets go?");
     } else if (level === 5) {
       // Intro page - just show welcome message
       setFlexiMessage("Welcome to Division by Zero! Let's learn about dividing apples into baskets. Ready to start? 🍎");
@@ -926,8 +933,9 @@ function App() {
                     alt="Flexi character" 
           className={`flexi ${level === 0 ? (flexiMoved ? 'zero-basket-final' : 'zero-basket-start') : ''}`}
         />
-        <div className={`flexi-speech-bubble ${level === 0 && (showFollowUpMessage || showFinalMessage) ? 'undefined-message-position' : ''}`}>
-          {level === 0 && !flexiResponse ? (
+                {level === 0 && showSpeechBubble && (
+        <div className={`flexi-speech-bubble ${level === 0 && (showFollowUpMessage || showFinalMessage) ? 'undefined-message-position' : ''}`}>
+          {level === 0 && !flexiResponse ? (
             <>
               {flexiMessage}
               <div className="answer-options">
@@ -1055,10 +1063,11 @@ function App() {
             </>
           ) : level >= 1 && level <= 3 ? (
             <div className="message-text">{flexiMessage}</div>
-          ) : (
-            flexiMessage
-          )}
-        </div>
+                    ) : (
+            flexiMessage
+          )}
+        </div>
+        )}
         {level !== 5 && (
           <div className="nav-buttons">
             <button 
