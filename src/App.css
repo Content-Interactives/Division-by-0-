@@ -671,6 +671,22 @@ body {
   min-width: 25px;
 }
 
+.division-expression {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+}
+
+.dividend, .divisor {
+  font-weight: 500;
+}
+
+.division-symbol {
+  font-size: 1.5rem;
+  margin: 0 4px;
+}
+
 .equals {
   margin: 0 4px;
 }

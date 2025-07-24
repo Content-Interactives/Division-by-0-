@@ -559,15 +559,20 @@ function App() {
 
   // Handle Flexi movement on zero basket page
   useEffect(() => {
-    if (level === 0 && !flexiMoved) {
+    if (level === 0) {
+      // Reset states when navigating to level 0
+      setFlexiMoved(false)
+      setShowSpeechBubble(false)
+      
+      // Start the animation timer
       const timer = setTimeout(() => {
         setFlexiMoved(true)
         setShowSpeechBubble(true)
-      }, 5000)
+      }, 4000)
       
       return () => clearTimeout(timer)
     }
-  }, [level, flexiMoved])
+  }, [level])
 
   // Clear highlight when apples are placed in baskets
   useEffect(() => {
@@ -1015,9 +1020,9 @@ function App() {
                 </>
               ) : !showFinalMessage ? (
                 <>
-                  <div className="flexi-response-message follow-up undefined-response">
-                    Since there are no baskets, we say the answer is undefined.
-                  </div>
+                                    <div className="flexi-response-message follow-up undefined-response">
+                    Since dividing by zero doesn't make sense, we say the answer is undefined.
+                  </div>
                   <div className="reaction-buttons">
                     <button 
                       className={`reaction-button ${followUpReaction === 'understand' ? 'selected' : ''}`}
@@ -1028,17 +1033,17 @@ function App() {
                   </div>
                 </>
               ) : (
-                <div className="flexi-response-message final">
-                  <div className="fraction-container">
-                    <div className="fraction">
-                      <div className="numerator">6</div>
-                      <div className="fraction-line"></div>
-                      <div className="denominator">0</div>
-                    </div>
-                    <div className="equals">=</div>
-                    <div className="undefined">Undefined</div>
-                  </div>
-                </div>
+                                <div className="flexi-response-message final">
+                  <div className="fraction-container">
+                    <div className="division-expression">
+                      <span className="dividend">6</span>
+                      <span className="division-symbol">÷</span>
+                      <span className="divisor">0</span>
+                    </div>
+                    <div className="equals">=</div>
+                    <div className="undefined">Undefined</div>
+                  </div>
+                </div>
               )}
               <div className="response-hint" onClick={handleResetResponse}>
                 (Click to try another answer)
