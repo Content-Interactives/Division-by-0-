@@ -64,7 +64,7 @@ body {
 }
 
 .apple:hover {
-  opacity: 0.8;
+  opacity: 1; /* prevent darkening on hover */
 }
 
 .apple.dragging {
@@ -778,8 +778,9 @@ body {
 }
 
 .apple.interactive:hover {
-  transform: translate(var(--x), var(--y)) scale(1.1);
-  opacity: 0.9;
+  /* Keep position but prevent zoom and opacity change */
+  transform: translate(var(--x), var(--y));
+  opacity: 1;
 }
 
 .apple.dragging {
