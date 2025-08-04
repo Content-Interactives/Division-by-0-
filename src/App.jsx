@@ -633,6 +633,15 @@ function App() {
       setFlexiMoved(false);
       setShowSpeechBubble(false);
       setFlexiMessage("Oh no! Where did all the baskets go?");
+
+      // Re-show Flexi and speech bubble after a short delay when restarting on the zero-basket page
+      if (messageTimeoutRef.current) {
+        clearTimeout(messageTimeoutRef.current);
+      }
+      messageTimeoutRef.current = setTimeout(() => {
+        setFlexiMoved(true);
+        setShowSpeechBubble(true);
+      }, 3000); // 3-second delay
     } else if (level === 5) {
       // Intro page - just show welcome message
       setFlexiMessage("Welcome to Division by Zero! Let's learn about dividing apples into baskets. Ready to start? 🍎");
