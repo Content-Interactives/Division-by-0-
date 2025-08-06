@@ -193,18 +193,34 @@ function App() {
         const applesInThisBasket = roundNumber;
         
         let jitterX, jitterY;
-        if (applesInThisBasket === 0) {
-          jitterX = 0; jitterY = 0;
-        } else if (applesInThisBasket === 1) {
-          jitterX = -20; jitterY = 0;
-        } else if (applesInThisBasket === 2) {
-          jitterX = 20; jitterY = 0;
+        if (numVisibleBaskets === 1) {
+          // Arrange 6 apples in a tidy 3×2 grid inside the single basket
+          // Order apples bottom row first (left → right), then top row
+          const gridOffsets = [
+            { x: -20, y: 12 },  // bottom-left (1st apple)
+            { x: 0,   y: 12 },  // bottom-center (2nd)
+            { x: 20,  y: 12 },  // bottom-right (3rd)
+            { x: -20, y: -10 }, // top-left (4th)
+            { x: 0,   y: -10 }, // top-center (5th)
+            { x: 20,  y: -10 }  // top-right (6th)
+          ];
+          const offset = gridOffsets[applesInThisBasket] || { x: 0, y: 0 };
+          jitterX = offset.x;
+          jitterY = offset.y;
         } else {
-          const stackPosition = applesInThisBasket - 2;
-          const stackRow = Math.floor(stackPosition / 3);
-          const stackCol = stackPosition % 3;
-          jitterX = stackCol === 0 ? -20 : stackCol === 1 ? 0 : 20;
-          jitterY = -15 * (stackRow + 1);
+          if (applesInThisBasket === 0) {
+            jitterX = 0; jitterY = 0;
+          } else if (applesInThisBasket === 1) {
+            jitterX = -20; jitterY = 0;
+          } else if (applesInThisBasket === 2) {
+            jitterX = 20; jitterY = 0;
+          } else {
+            const stackPosition = applesInThisBasket - 2;
+            const stackRow = Math.floor(stackPosition / 3);
+            const stackCol = stackPosition % 3;
+            jitterX = stackCol === 0 ? -20 : stackCol === 1 ? 0 : 20;
+            jitterY = -15 * (stackRow + 1);
+          }
         }
         
         const finalX = basketPos.centerX + jitterX;
