@@ -199,10 +199,10 @@ function App() {
           const gridOffsets = [
             { x: -20, y: 12 },  // bottom-left (1st apple)
             { x: 0,   y: 12 },  // bottom-center (2nd)
-            { x: 20,  y: 12 },  // bottom-right (3rd)
-            { x: -20, y: -10 }, // top-left (4th)
-            { x: 0,   y: -10 }, // top-center (5th)
-            { x: 20,  y: -10 }  // top-right (6th)
+            { x: 30,  y: 12 },  // bottom-right (3rd) - moved further right
+            { x: -25, y: -10 }, // top-left (4th) - shifted right 5px
+            { x: 5,   y: -10 }, // top-center (5th) - shifted right 5px
+            { x: 35,  y: -10 }  // top-right (6th) - shifted right 5px
           ];
           const offset = gridOffsets[applesInThisBasket] || { x: 0, y: 0 };
           jitterX = offset.x;
@@ -213,7 +213,7 @@ function App() {
           } else if (applesInThisBasket === 1) {
             jitterX = -20; jitterY = 0;
           } else if (applesInThisBasket === 2) {
-            jitterX = 20; jitterY = 0;
+            jitterX = 30; jitterY = 0; // move third apple further right
           } else {
             const stackPosition = applesInThisBasket - 2;
             const stackRow = Math.floor(stackPosition / 3);
