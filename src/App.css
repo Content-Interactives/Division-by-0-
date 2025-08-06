@@ -460,8 +460,8 @@ body {
   position: absolute;
   top: -5px;
   left: 50%;
-  width: 90px;
-  height: 90px;
+  width: 110px; /* widen so vertical parts align with basket sides */
+  height: 110px;
   border: 6px solid #D4A76A;
   border-radius: 50%;
   transform: translateX(-50%);
