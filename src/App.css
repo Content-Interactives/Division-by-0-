@@ -907,15 +907,91 @@ body {
 /* Mobile responsive scaling */
 @media (max-width: 600px) {
   body {
-    overflow-x: hidden;
-    justify-content: flex-start; /* remove center to prevent overflow */
-    align-items: flex-start;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
   }
   .container {
-    --scale: calc(100vw / 600);
+    --scale: calc(min(100vw, 100vh) / 600 * 0.1);
     width: 600px;
     height: 600px;
     transform: scale(var(--scale));
-    transform-origin: top left;
+    transform-origin: center;
+  }
+  
+  /* Move Flexi more to the right and up on mobile */
+  .flexi {
+    left: 60px !important;
+    bottom: 40px !important;
+  }
+  
+  .flexi.zero-basket-start {
+    left: 60px !important;
+  }
+  
+  .flexi.zero-basket-final {
+    left: 30% !important;
+    bottom: 240px !important;
+  }
+  
+  .no-baskets .flexi:not(.zero-basket-start) {
+    left: 30% !important;
+    bottom: 240px !important;
+  }
+  
+  /* Move speech bubble more to the right on mobile */
+  .flexi-speech-bubble {
+    left: 200px !important;
+  }
+  
+  .no-baskets .flexi-speech-bubble {
+    left: calc(30% + 80px) !important;
+    bottom: 200px !important;
+  }
+  
+  /* Move title slightly right on mobile */
+  .title {
+    left: 55% !important;
+    transform: translateX(-50%) !important;
+  }
+  
+  /* Move restart button down on mobile */
+  .restart-button {
+    top: 40px !important;
+  }
+  
+  /* Move apple tree slightly right on mobile */
+  .apple-tree {
+    right: 20px !important;
+  }
+  
+  /* Move navigation buttons up on mobile */
+  .nav-buttons {
+    bottom: 60px !important;
+  }
+  
+  /* Center baskets on mobile with right shift */
+  .baskets-container {
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 40px !important;
+    transform: translateX(40px) !important;
+  }
+  
+  /* Adjust apple positioning to match basket shift */
+  .apple {
+    transform: translate(var(--x), var(--y)) !important;
+  }
+  
+  .apple.dragging {
+    transform: translate(var(--x), var(--y)) !important;
+  }
+  
+  .apple.hint-move {
+    transform: translate(var(--x), var(--y)) !important;
+  }
+  
+  .apple.highlight {
+    transform: translate(var(--x), var(--y)) !important;
   }
 }
