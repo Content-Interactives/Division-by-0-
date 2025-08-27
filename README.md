@@ -1,12 +1,45 @@
-# React + Vite
+# Division by Zero Interactive
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the code for the **Division by Zero Interactive**, designed to help students explore and understand the concept of division by zero using engaging visuals and instant feedback.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🔗 Live Interactive
 
-## Expanding the ESLint configuration
+Try it out here:  
+👉 https://content-interactives.github.io/Division-by-0-/
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🌐 Where This Interactive Is Being Used
+
+This interactive is currently featured in the following locations:
+
+- <img width="20" height="20" alt="image" src="https://github.com/user-attachments/assets/5d12571f-8e12-4441-98ab-c0bc94069a96" /> **CK-12 Intent Response**  
+  - 👉 PRODUCTION: [PENDING]  
+  - 👉 MASTER: [PENDING]
+- 📘 **CK-12 Flexbooks**  
+  - 👉 [PENDING: Book/lesson link where this interactive appears]
+
+---
+
+## 📚 Standards & Subjects
+
+This interactive aligns with the following topics and standards:
+
+- **📂 Subject Area**: Middle School Math (Grade 6)  
+- **🧮 Topic**: Division by Zero — Understanding the Undefined Nature of Division by Zero  
+- **📏 Common Core**:  
+  - **CCSS.MATH.CONTENT.6.NS.B.2** – Fluently divide multi-digit numbers using the standard algorithm.  
+  - **CCSS.MATH.CONTENT.7.NS.A.2** – Apply and extend previous understandings of operations with fractions.  
+  - **CCSS.MATH.CONTENT.7.NS.A.2.b** – Understand that integers can be divided, provided that the divisor is not zero, and every quotient of integers (with non-zero divisor) is a rational number.  
+  - **CCSS.MATH.CONTENT.7.NS.A.2.c** – Apply and extend previous understandings of operations with fractions.  
+  - **CCSS.MATH.CONTENT.7.NS.A.2.d** – Apply and extend previous understandings of operations with fractions.
+
+---
+
+## 🛠️ Developer Notes
+
+- Built with: React, Vite, TypeScript, Tailwind CSS  
+- Deployed via: GitHub Pages  
+- See `index.html` and supporting assets in `src/` and `public/` folders
